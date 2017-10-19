@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="引言近年来，软件工程师的触角早已经慢慢地向传统硬件工程师的保留领地里伸去。例如FPGA的出现使得硬件设计从原来的原理图-&amp;gt;PCB图-&amp;gt;制板-&amp;gt;焊接-&amp;gt;调试-&amp;gt;改板-&amp;gt;制板-&amp;gt;焊接的长周期、慢节奏开发中解放出来。缩短了硬件开发的周期，等同于延长了硬件工程师的寿命。 软件行业的先进内容软件行业中一些先进的理念正在被引入硬件设计中,例如版本控制。在软件行业中，我">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hackrf 入门">
+<meta property="og:url" content="https://bg7ezy.github.io/2017/10/19/Hackrf-入门/index.html">
+<meta property="og:site_name" content="BG7EZY&#39;S BLOG">
+<meta property="og:description" content="引言近年来，软件工程师的触角早已经慢慢地向传统硬件工程师的保留领地里伸去。例如FPGA的出现使得硬件设计从原来的原理图-&amp;gt;PCB图-&amp;gt;制板-&amp;gt;焊接-&amp;gt;调试-&amp;gt;改板-&amp;gt;制板-&amp;gt;焊接的长周期、慢节奏开发中解放出来。缩短了硬件开发的周期，等同于延长了硬件工程师的寿命。 软件行业的先进内容软件行业中一些先进的理念正在被引入硬件设计中,例如版本控制。在软件行业中，我">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-10-19T06:32:45.368Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hackrf 入门">
+<meta name="twitter:description" content="引言近年来，软件工程师的触角早已经慢慢地向传统硬件工程师的保留领地里伸去。例如FPGA的出现使得硬件设计从原来的原理图-&amp;gt;PCB图-&amp;gt;制板-&amp;gt;焊接-&amp;gt;调试-&amp;gt;改板-&amp;gt;制板-&amp;gt;焊接的长周期、慢节奏开发中解放出来。缩短了硬件开发的周期，等同于延长了硬件工程师的寿命。 软件行业的先进内容软件行业中一些先进的理念正在被引入硬件设计中,例如版本控制。在软件行业中，我">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://bg7ezy.github.io/2017/10/19/Hackrf-入门/"/>
+
+
+
+
+
+  <title>Hackrf 入门 | BG7EZY'S BLOG</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">BG7EZY'S BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">没有什么能够阻挡，我对自由的向往。</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/baidusitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://bg7ezy.github.io/2017/10/19/Hackrf-入门/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="BG7EZY">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://img.hb.aicdn.com/a5dc9816e8c828d214151e4e4a3987090c966a1a2ad3c-WU5i7W_fw658">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="BG7EZY'S BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Hackrf 入门</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-19T14:32:14+08:00">
+                2017-10-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+            <!--noindex-->
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/10/19/Hackrf-入门/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count hc-comment-count" data-xid="2017/10/19/Hackrf-入门/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+              <!--/noindex-->
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"><span></span><span>阅读</span></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h4><p>近年来，软件工程师的触角早已经慢慢地向传统硬件工程师的保留领地里伸去。例如FPGA的出现使得硬件设计从原来的原理图-&gt;PCB图-&gt;制板-&gt;焊接-&gt;调试-&gt;改板-&gt;制板-&gt;焊接的长周期、慢节奏开发中解放出来。缩短了硬件开发的周期，等同于延长了硬件工程师的寿命。</p>
+<h4 id="软件行业的先进内容"><a href="#软件行业的先进内容" class="headerlink" title="软件行业的先进内容"></a>软件行业的先进内容</h4><p>软件行业中一些先进的理念正在被引入硬件设计中,例如版本控制。在软件行业中，我们使用如SVN和GIT等工具对软件代码进行管理，基本地思想是，将程序员每次对代码的改动，都做为一个版本提交到版本库中，不同的版本之间可以进行对比和合并。<br>&lt;– more –&gt;</p>
+<p>而硬件设计中，由于大部分EDA软件不提供该功能，使得硬件工程师只能人工地管理电路的原理图和PCB图，经常出现版本混乱的情况。</p>
+<p>开源的电路设计软件如KiCAD将所有的原理图和PCB图以纯文本的方式保存，这样硬件设计过程中也可以使用版本控制系统对每一次改动进行跟踪。</p>
+<h4 id="开源-GPL"><a href="#开源-GPL" class="headerlink" title="开源, GPL"></a>开源, GPL</h4><p>开源协议中最著名的是GPL(GNU Public License)。GPL最美妙的地方在于，你使用了或者说是“抄袭”了GPL代码并没有关系，但是只要你用了GPL的代码，你就必须要把你基于此做出的成果也按照GPL协议发布出来。</p>
+<p>而GPL之外的软件世界，大家都在小心地维护着不被珍视的版权，敝帚自珍。开源的思想是鼓励你把你的作品发布出来，勇于接受其它的人学习以及批评。</p>
+<p>在GPL等开源协议的引领下，开源软件世界已经形成了一整套有生命力、有活力的软件工具体系。Linux的成功证实了一点。</p>
+<h4 id="无线电"><a href="#无线电" class="headerlink" title="无线电"></a>无线电</h4><p>同样，在无线电这一发展了一个多世纪的行业中，软件设计模式的加入，使得近年来无线电的玩法出现了新的变化。人们不再需要为一种特定的调制解调方案而单独地设计对应的硬件，并耗巨大的精力和时间对硬件各部分进行调优。</p>
+<p>于是，我们想到可以用数字的方法，以不变应万变的形式，使用一块射频前端板卡，将无线信号变频到基带部分，然后将全部带宽采样回电脑，所有原来由特定硬件来实现的功能如混频器、滤波器、放大器、衰减器都变成了计算机中的运算。</p>
+<h4 id="为什么我们需要开源软件无线电"><a href="#为什么我们需要开源软件无线电" class="headerlink" title="为什么我们需要开源软件无线电?"></a>为什么我们需要开源软件无线电?</h4><p>无线电行业已经逐渐被安捷伦(是德科技)和罗德施瓦茨等巨头公司垄断，他们造出一块又一块仪表，写出一摞又一摞让人看不懂的通信标准，把好好的功能拆分成一个又一个的选件(Option)来卖钱。如同早期玩电脑的人可以接触一些命令行、了解一些电脑的内部原理，现在玩电脑的人早就被360等公司包围的严严实实，让你无暇也无力去了解电脑及互联网的任何原理。</p>
+<p>GNURadio就是开源世界中软件无线电的代表项目。它的出现，使得开源世界能够打破传统通信巨头的垄断，使得人们能够自由地了解整个通信系统的任何细节。</p>
+<p>GNURadio实现了软件无线电所需要的大部分模块，并且完成了对于采样数据流的缓冲、调度，并由开源社区集体维护。值得一提的是，GNURadio不同于MATLAB等旨在仿真的工具，它生来就是准备玩真的，GNURadio对于软件无线电射频前端硬件的支持非常全面，例如USRP、HackRF、BladeRF等。</p>
+<p>这篇<a href="http://www.taylorkillian.com/2013/08/sdr-showdown-hackrf-vs-bladerf-vs-usrp.html" target="_blank" rel="external">文章</a>仔细地分析了三者的区别和优缺点。<a href="http://blog.sina.com.cn/s/blog_72628e9f0101c25g.html" target="_blank" rel="external">这里</a>给了一个中译版。总的说来，USRP B2X0 系列价格最贵、性能最好；bladeRF 支持频段没有那么宽，但优点在于可以脱机运行；HackRF 价格低廉、开放程度高，最适合黑客玩家。</p>
+<p>特别值得一提的是，HackRF是完全开源的软件无线电射频前端。它从原理图到PCB图，从驱动程序到单片机固件，甚至连加工制板所需要的工艺要求，全部以GPL协议无保留地发布，这对于我们学习研究软件无线电无疑是一件非常值得庆幸的事情。</p>
+<p>HackRF已经在KickStarter上卖出了2000多块板卡。而BladeRF只卖出了500块板卡。</p>
+<h4 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h4><p>在本书中，笔者试图以一个非通信科班出身的资深的Linux玩家的视角，浅显地解释无线电的一些基本知识，并以HackRF为基础，向大家介绍开源软件无线电框架GNURadio的基本用法及示例。期望有更多的软件工程师能够发现这一块尚未被开垦的大陆，从而为开源软件无线电贡献出更多更好的开源项目。</p>
+<h4 id="Hello-World-快速上手"><a href="#Hello-World-快速上手" class="headerlink" title="Hello, World. 快速上手"></a>Hello, World. 快速上手</h4><p>本章试图以几个简单易懂的示例，向大家不经证明地展示一些无线电及信号处理的一些有趣的事实。旨在使读者能够对我们所要研习的领域有一个全面、粗犷而不失准确的认识。</p>
+<p>本章假定读者对于Linux有基本的操作能力，能读懂理解基本的Python语言，假定读者对于频率、载波、相位等概念有基本的认识，并接触过示波器等常见工科仪表。</p>
+<h4 id="HackRF的FM广播接收"><a href="#HackRF的FM广播接收" class="headerlink" title="HackRF的FM广播接收"></a>HackRF的FM广播接收</h4><h5 id="在Windows系统"><a href="#在Windows系统" class="headerlink" title="在Windows系统"></a>在Windows系统</h5><pre><code>首先安装[Zadig](http://sourceforge.net/projects/libwdi/files/zadig/)
+将HackRF与电脑连接，按一下HackRF的电源/Reset按钮使其开机
+使用Zadig安装其驱动。
+下载最新版本的[SDR#](http://sdrsharp.com/downloads/sdr-nightly.zip)
+(可选)下载Windows平台的[hackrf-tools](http://the.midnightchannel.net/sdr/SDRSharp_Plugins/zefie/SDRSharp.HackRF.ZefieMod/hackrf-tools.zip)
+    需要安装Microsoft Visual C++ 2012 Redistributable Package
+</code></pre><p>TODO: SDR#的截图 TODO: 加入Zadig截图</p>
+<p>然后打开SDR#，即可尝试接收FM广播了。</p>
+<h5 id="Linux系统"><a href="#Linux系统" class="headerlink" title="Linux系统"></a>Linux系统</h5><p>参照gqrx.dk上的安装指南<br>安装GNURadio</p>
+<p>现在推荐使用<a href="http://www.hackrf.net/2016/06/pybombs-mirror-tuna/" target="_blank" rel="external">TUNA镜像提供的PyBOMBS</a>来安装GNURadio。<br>编译安装gqrx<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> git clone https://github.com/csete/gqrx.git gqrx.git</div><div class="line"><span class="meta">$</span> cd gqrx.git</div><div class="line"><span class="meta">$</span> mkdir build</div><div class="line"><span class="meta">$</span> cd build</div><div class="line"><span class="meta">$</span> qmake ..</div><div class="line"><span class="meta">$</span> make</div></pre></td></tr></table></figure></p>
+<p>LiveCD试用</p>
+<p>如果现在还没有时间和精力来编译安装gqrx甚至GNURadio环境，可以使用社区其它人已经搭建好的<a href="http://files.persona.cc/linux/ubuntu/ubuntu-12.04.2-custom-sdr-amd64.iso" target="_blank" rel="external">LiveCD</a>引导光盘试用GNURadio。</p>
+<p>放入光盘，重启电脑，选择以光盘引导。</p>
+<p>打开HackRF的电源按钮。</p>
+<p>只需要打开终端，输入hackrf_info命令<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> hackrf_info </div><div class="line">Found HackRF board.</div><div class="line">Board ID Number: 2 (Unknown Board ID)</div><div class="line">Firmware Version: git-f9ffe90</div><div class="line">Part ID Number: 0xbc5f4f4a 0xbc5f4f4a</div><div class="line">Serial Number: 0x00000000 0x00000000 0x261c63c8 0x26776d53</div></pre></td></tr></table></figure></p>
+<p>证明HackRF已经被电脑所识别。然后输入<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">gqrx</div></pre></td></tr></table></figure></p>
+<p>然后选择硬件为HackRF，然后按下左上角的开关按钮，并将HackRF调谐到103.9MHz，不出意外的话，你就可以听到FM广播了。</p>
+<p>TODO: gqrx的照片</p>
+<h4 id="osmocom-fft-osmocom-siggen"><a href="#osmocom-fft-osmocom-siggen" class="headerlink" title="osmocom_fft osmocom_siggen"></a>osmocom_fft osmocom_siggen</h4><p>使用osmocom_fft 即可开启一个简单的频谱仪</p>
+<p>osmocom_siggen 则提供了一个简单的信号发生器</p>
+<h4 id="FM-广播的发射"><a href="#FM-广播的发射" class="headerlink" title="FM 广播的发射"></a>FM 广播的发射</h4><p>随便找一个mp3文件什么的，转换成WAV文件。在此建议转换成44.1kHz，双声道。</p>
+<p>例如使用ffmpeg转换:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ffmpeg -i source.mp3 music.wav</div></pre></td></tr></table></figure></p>
+<p>打开gnuradio-companion搭建一个框图</p>
+<h5 id="WAV-Source"><a href="#WAV-Source" class="headerlink" title="WAV Source"></a>WAV Source</h5><pre><code>samp_rate采样率要设置为250kHz，这个与我们的wav文件采样率为44.1kHz有关。实际试验，如果samp_rate设置为500kHz，放出来的声音会加速一倍。
+N Channels表示Wav文件的声道数，填2
+File里填写你在上一步制备的Wav文件地址
+</code></pre><h5 id="Stream-Mux"><a href="#Stream-Mux" class="headerlink" title="Stream Mux"></a>Stream Mux</h5><p>Stream Mux的作用是把两条数据流合并为一条流，例如N0是来自第一条流的采样点，N1来自第二条流采样点，则Stream Mux会将两条流以如下方式输出:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[N0, N1, N0, N1, N0, N1, ...]</div></pre></td></tr></table></figure></p>
+<p>值得注意的是此处的Type需要填为Float，GNURadio里的数据类型是以颜色表示的。</p>
+<p>另外，同一主色的情况下，颜色越深表示它是一个Vector。TODO: 待仔细调查</p>
+<h5 id="Osmocom-Sink"><a href="#Osmocom-Sink" class="headerlink" title="Osmocom Sink"></a>Osmocom Sink</h5><p>在GNURadio里，Sink表示信号输出，Source表示信号输入。</p>
+<pre><code>Device Arguments可以填上hackrf=0
+sample rate设置为samp_rate*4
+Ch0 Freq Corr (ppm)
+    HackRF的频率较正值，在没有经过仪表校正时，可以直接先填0，有条件的同学可以使用频谱仪或信号源进行标定。
+    Ch0 Frequency 要发射的频率，此处我填了93e6，表示93MHz
+    Ch0 RF Gain(dB)
+        表示HackRF放大器是否开启
+        尽管此处Gain可任意输入，但事实上只有两档，0和14dB，并不是连续可调的，在此我们填14
+    Ch0 IF Gain(dB)
+        表示HackRF的中频增益
+        从电路上来看，应试指的是进入MAX2837收发器后给的增益
+        在此我们填40
+    Ch0 BB Gain(dB)
+        表示HackRF的基带增益
+        可能指是的进入ADC/DAC芯片后给的增益
+        在此我们填20
+    Ch0 BandWidth，填250e3
+</code></pre><p>另外，你自行尝试将上述框图中的Wav File Source改为Audio Source，即可实现语音的实时FM发射。注意要修改一下各个采样率。</p>
+<p>警告: 请短时间尝试性的操作，切勿长时间干扰正常业务频率。</p>
+<h4 id="遥控小车的重放"><a href="#遥控小车的重放" class="headerlink" title="遥控小车的重放"></a>遥控小车的重放</h4><p>市面上的遥控小车多使用27MHz或者40MHz等频率进行遥控。在此我们在不分析遥控信号的情况下，对信号进行录制和重放，使大家对HackRF的操作有一个简单的认识。</p>
+<p>在本书的后续章节，我们会进一步地分析市面上一种常见的遥控小车的遥控器，并使用GNURadio编写信号处理模块，重新生成遥控小车的指令，最后简单实现一个电脑上具有图形界面的遥控小车的控制程序。</p>
+<p>我们使用内嵌的hackrf_transfer指令来实现录制-回放。首先看一下hackrf_transfer的用法:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> hackrf_transfer </div><div class="line">receive -r and receive_wav -w options are mutually exclusive</div><div class="line">Usage:</div><div class="line">    -r &lt;filename&gt; # Receive data into file.</div><div class="line">    -t &lt;filename&gt; # Transmit data from file.</div><div class="line">    -w # Receive data into file with WAV header and automatic name.</div><div class="line">       # This is for SDR# compatibility and may not work with other software.</div><div class="line">    [-f set_freq_hz] # Set Freq in Hz between [5MHz, 6800MHz]. 设置中心频率</div><div class="line">    [-a set_amp] # Set Amp 1=Enable, 0=Disable. 设置10dB放大器是否打开 </div><div class="line">    [-l gain_db] # Set lna gain, 0-40dB, 8dB steps 低噪声放大器增益</div><div class="line">    [-i gain_db] # Set vga(if) gain, 0-62dB, 2dB steps VGA放大器(中频)</div><div class="line">    [-x gain_db] # Set TX vga gain, 0-47dB, 1dB steps 发射的增益</div><div class="line">    [-s sample_rate_hz] # Set sample rate in Hz (8/10/12.5/16/20MHz, default 10MHz). 设置采样率</div><div class="line">    [-n num_samples] # Number of samples to transfer (default is unlimited). 传输的采样点数</div><div class="line">    [-b baseband_filter_bw_hz] # Set baseband filter bandwidth in MHz. 设置基带滤波器带宽(MHz)</div><div class="line">    Possible values: 1.75/2.5/3.5/5/5.5/6/7/8/9/10/12/14/15/20/24/28MHz, default &lt; sample_rate_hz.</div></pre></td></tr></table></figure></p>
+<p>需要注意几点: - 此处的VGA是指Variable Gain Amplifier，指可变增益的放大器。 - 虽然HackRF的宣传文档里写的是支持30MHz到6GHz，但是实际上驱动支持从5MHz到6800MHz<br>录制指令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">$ hackrf_transfer -r car.iq -f 27000000 -s 8000000 -i 60</div><div class="line">call hackrf_sample_rate_set(8000000 Hz/8.000 MHz)</div><div class="line">call hackrf_baseband_filter_bandwidth_set(7000000 Hz/7.000 MHz)</div><div class="line">call hackrf_set_freq(27000000 Hz/27.000 MHz)</div><div class="line">Stop with Ctrl-C</div><div class="line">16.0 MiB / 1.000 sec = 16.0 MiB/second</div><div class="line">16.0 MiB / 1.000 sec = 16.0 MiB/second</div><div class="line">16.0 MiB / 1.000 sec = 16.0 MiB/second</div><div class="line">^CCaught signal 2</div><div class="line"> 4.2 MiB / 0.273 sec = 15.3 MiB/second</div><div class="line"></div><div class="line">User cancel, exiting...</div><div class="line">Total time: 3.27395 s</div><div class="line">hackrf_stop_rx() done</div><div class="line">hackrf_close() done</div><div class="line">hackrf_exit() done</div><div class="line">fclose(fd) done</div><div class="line">exit</div></pre></td></tr></table></figure></p>
+<p>然后使用玩具小车的遥控器靠近HackRF的天线，操作小车，完毕后按Ctrl-C结束程序</p>
+<p>其中，-f参数是指采回的中心频率，在这里的意思是把27.0MHz为中心，共8M带宽的信号，下变频到0Hz为中心频率，并传输回计算机，保存成为car.iq。 -i 60参数是接收中频增益<br>重放指令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">$ hackrf_transfer -t car.iq -f 27000000 -s 8000000 -a 1 -l 30 -x 40 </div><div class="line">call hackrf_sample_rate_set(8000000 Hz/8.000 MHz)</div><div class="line">call hackrf_baseband_filter_bandwidth_set(7000000 Hz/7.000 MHz)</div><div class="line">call hackrf_set_freq(27000000 Hz/27.000 MHz)</div><div class="line">call hackrf_set_amp_enable(1)</div><div class="line">Stop with Ctrl-C</div><div class="line">16.0 MiB / 1.000 sec = 16.0 MiB/second</div><div class="line">16.0 MiB / 1.000 sec = 16.0 MiB/second</div><div class="line">16.0 MiB / 1.000 sec = 16.0 MiB/second</div><div class="line"> 4.7 MiB / 1.000 sec =  4.7 MiB/second</div><div class="line"></div><div class="line">User cancel, exiting...</div><div class="line">Total time: 4.00070 s</div><div class="line">hackrf_stop_tx() done</div><div class="line">hackrf_close() done</div><div class="line">hackrf_exit() done</div><div class="line">exit</div></pre></td></tr></table></figure></p>
+<p>注意 <code>-a 1</code> 打开HackRF的功率放大器，使最终的信号提升10dB。 <code>-l</code> 参数设置了HackRF的LNA(Low Noise Amplifier,低噪声放大器的增益)，<code>-x</code> 参数设置了HackRF的发射中频增益。在此，我们选择这些参数，以使得HackRF的发射功率适当。</p>
+<p>然后，你就会发现遥控小车按照你刚刚录制的动作跑起来了。</p>
+<p>另外，关于 <code>hackrf_transfer</code> 的详细情况，可以参考代码 <code>hackrf/host/hackrf-tools/src/hackrf_transfer.c</code> 。<br>宽带录制</p>
+<p>由于HackRF最大支持20MHz的采样率，于是我们可以一次把市面上的27MHz和40MHz的遥控车同时录制。</p>
+<p>我们选取35MHz为采样的中心。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">hackrf_transfer -r both.iq -f 35000000 -s 20000000 -i 60</div><div class="line"></div><div class="line">hackrf_transfer -t both.iq -f 35000000 -s 20000000 -a 1 -l 30 -x 40</div></pre></td></tr></table></figure></p>
+<h5 id="预备知识"><a href="#预备知识" class="headerlink" title="预备知识"></a>预备知识</h5><p>本章试图以浅显而直观地方式简要地介绍在软件无线电中会经常遇到的一些常用名词。</p>
+<p>章节末提供了一个使用声卡在示波器上打字的示例，以加深读者的理解。</p>
+<h4 id="CW-莫尔斯码"><a href="#CW-莫尔斯码" class="headerlink" title="CW / 莫尔斯码"></a>CW / 莫尔斯码</h4><p>Morse Code，又称CW，是最古老但是也最广泛的无线电通信方式了。由于CW通信方式所占用的带宽小、抗干扰能力强。作为一种信息编码标准，摩尔斯电码拥有其他编码方案无法超越的长久生命。摩尔斯电码在海事通讯中被作为国际标准一直使用到1999年。1997年，当法国海军停止使用摩尔斯电码时，发送的最后一条消息是：所有人注意，这是我们在永远沉寂之前最后的一声呐喊！</p>
+<p>如果你想学习莫尔斯码，最简单的方式就是在手机上装一个Morse Code练习软件，例如笔者某天晚上，于学校的操场上一边练习一边散步，走了十几圈后，就可以不加参考地发送莫尔斯码了。</p>
+<p>在Linux系统里，xcwcp和gMFSK两个程序可以帮助你做一些简单的莫尔斯码通讯训练。</p>
+<p>Google曾经在2012年的愚人节推出了手机的<a href="http://mail.google.com/mail/help/promos/tap/" target="_blank" rel="external">莫尔斯码输入法</a>。</p>
+<p>美国NBC电视台有一期<a href="http://v.youku.com/v_show/id_XMTU1MDc5MDQ=.html" target="_blank" rel="external">节目</a>，同样一段文字，一组人使用手机发送，另一组人使用FT817便捷式短波发信机通过摩尔斯码自动键进行收发。结果摩尔斯码组明显获胜。</p>
+<p>顺便提一句，此刻北京市仍然可以发电报，在出西单地铁站不远，出门右转的联通营业厅。有兴趣的同学可以去体验一下。</p>
+<h4 id="业余无线电"><a href="#业余无线电" class="headerlink" title="业余无线电"></a>业余无线电</h4><p>业余无线电是一种在全世界非常普遍的业余爱好。喜爱业余无线电的人也被称为业余无线电爱好者或HAM，在美国大约有一百多万人，日本大约有三百万人，中国大约有二十万人，在全世界总共大约四百多万人。他们必须学习相关知识并通过所在国家的测试才能领取到业余无线电执照，同时领取政府分配给的呼号。</p>
+<p>例如在北京，获取业余无线电执照，需要向北京市无线电协会(www.brsa.org.cn)提交申请，然后参加培训、考试和验机，最后才可以获取操作能力证书和电台执照。</p>
+<p>qrz.com提供了全球无线电爱好者的呼号查询服务。</p>
+<p>业余无线电爱好者完成一次通联之后，会通过卡片收寄局或邮件方式双方互送QSL卡片。</p>
+<p>例如下图即是清华集体业余电台(BY1QH)的台址和通联卡片，摘自<a href="http://qrz.com/db/BY1QH" target="_blank" rel="external">http://qrz.com/db/BY1QH</a></p>
+<p>无线爱好者之间通常使用一种名为Q简语的三字符缩写来提升通信效率。例如: QTH代表台址，QRP代表减小发信机功率。</p>
+<p>通联结束后，双方会互致73表达问候。73在摩尔斯码里的表示是–… …–，是一段非常对仗的声音。</p>
+<p>更多关于业余无线电的知识，可以参阅望京集体业余电台(BY1WJ)的网站<a href="http://www.by1wj.com/" target="_blank" rel="external">http://www.by1wj.com</a><br>ISM Band 免执照频段</p>
+<h4 id="gMFSK"><a href="#gMFSK" class="headerlink" title="gMFSK"></a>gMFSK</h4><p>gMFSK是一个非常强大的Linux平台下的业余无线电调制解调软件。</p>
+<p>需要注意的是，由于最近的Linux发行版都使用ALSA做为声卡驱动，而gMFSK目前还只能使用旧的OSS声卡驱动。</p>
+<p>但是我们可以使用alsa-oss这个软件包提供的aoss脚本，来为gMFSK伪造出一个/dev/dsp接口出来。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sudo apt-get install alsa-oss</div><div class="line"></div><div class="line">aoss gmfsk</div></pre></td></tr></table></figure></p>
+<h4 id="DTMF"><a href="#DTMF" class="headerlink" title="DTMF"></a>DTMF</h4><p>以大提琴演奏家杜普蕾(Jacqueline Mary du Pré)为主题的电影《她比烟花寂寞》(英文片名: Hilary and Jackie)中有一个细节，杜普蕾用大提琴发出DTMF声音，拔通了电话。名侦探柯南剧场版第12部《战栗的乐谱》中也有类似的桥段。</p>
+<p>DTMF(Dual-Tone Multi-Frequency, 双音多频)的原理是键盘上的所有按键由高音部分(1209Hz, 1336Hz, 1477Hz, 1633Hz)和低音部分(697Hz, 770Hz, 852Hz, 941Hz)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sudo apt-get install multimon</div><div class="line"></div><div class="line">aoss multimon -a DTMF</div></pre></td></tr></table></figure></p>
+<p>然后拿起手机，打开拨号键盘，按下几个声音，然后multimon便可以解析出DTMF。</p>
+<p>进一步地，我们使用gnuradio-companion搭建一个简单的声音频谱仪，直接对话筒输入的声音进行FFT。</p>
+<p>当手机发出2的拨号音时的频谱697Hz,1336Hz</p>
+<p>那么，最后我们再用gnuradio-companion搭建一个简单的生成DTMF中2键的框图</p>
+<p>值得一提有两点：</p>
+<pre><code>注意各个模块的端口颜色，代表了不同的数据类型。黄色表示float，搭建的时候需要做修改。
+最后加入Multipy Const来减小声音的响度
+</code></pre><p>然后先开启multimon，然后再执行我们的框图。multimon便解析出我们生成的2了。</p>
+<p>另外，multimon也是一个非常有趣的项目，不止可以完成DTMF的解调，还可以完成AX.25信号的解调。此外，multimon-ng项目为multimon增加了更多的解调模式。</p>
+<h4 id="声卡示波器"><a href="#声卡示波器" class="headerlink" title="声卡示波器"></a>声卡示波器</h4><p>上图中，我们使用声卡的左右声道输出分别接到示波器的X-Y两路，使得示波器显示了汉字。</p>
+<p>示波器的X-Y模式可以理解为，把X路输入的电压值反映为示波器电子枪对于电子横向的偏转，把Y路输入的电压值反映为示波器电子枪对于电子纵向的偏转。 于是，我们只需要生成一系列X,Y的数值组合，就可以操控示波器的显示了。</p>
+<p>我们使用画图软件生成一幅黑白图片，然后使用Python编写一段小脚本将上述图片转换成为声音。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> wave</div><div class="line"><span class="keyword">import</span> struct</div><div class="line"><span class="keyword">import</span> Image</div><div class="line"></div><div class="line">BLACK = <span class="number">0</span></div><div class="line">WHITE = <span class="number">255</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">getImage</span><span class="params">()</span>:</span></div><div class="line">    im = Image.open(<span class="string">'startest.bmp'</span>) <span class="comment">#black and white 1000 x 270</span></div><div class="line">    pix = im.load() <span class="comment">#black is 0; white is 255</span></div><div class="line">    <span class="keyword">print</span> im.size</div><div class="line">    <span class="keyword">return</span> pix</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></div><div class="line">    im = Image.open(<span class="string">'startest.bmp'</span>) <span class="comment">#black and white 1000 x 270</span></div><div class="line">    pix = im.load() <span class="comment">#black is 0; white is 255</span></div><div class="line">    <span class="keyword">print</span> im.size <span class="comment"># 1000,270</span></div><div class="line"></div><div class="line">    f = wave.open(<span class="string">'startest.wav'</span>,<span class="string">'w'</span>)</div><div class="line">    f.setsampwidth(<span class="number">2</span>)</div><div class="line">    f.setnchannels(<span class="number">2</span>)</div><div class="line">    f.setframerate(<span class="number">192000</span>)</div><div class="line"></div><div class="line">    max_x = im.size[<span class="number">0</span>]</div><div class="line">    max_y = im.size[<span class="number">1</span>]</div><div class="line">    data = []</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(im.size[<span class="number">0</span>]):</div><div class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> range(im.size[<span class="number">1</span>]):</div><div class="line">        <span class="keyword">if</span> pix[i,j] == BLACK:</div><div class="line">            x = -(<span class="number">65535.0</span> * i*<span class="number">1.0</span>/max_x - <span class="number">32767.0</span>) * <span class="number">0.8</span></div><div class="line">            y = (<span class="number">65535.0</span> * j*<span class="number">1.0</span>/max_y - <span class="number">32767.0</span>) * <span class="number">0.8</span></div><div class="line">            d = struct.pack(<span class="string">'hh'</span>,y,x)</div><div class="line">            data.append(d)</div><div class="line">    <span class="keyword">for</span> v <span class="keyword">in</span> range(<span class="number">10</span>): <span class="comment">#重复10遍，以延长WAV文件时间，使效果更明显</span></div><div class="line">    <span class="keyword">for</span> d <span class="keyword">in</span> data:</div><div class="line">        f.writeframes(d)</div><div class="line">    f.close()        </div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</div><div class="line">    main()</div></pre></td></tr></table></figure></p>
+<p>最后，找到一根废旧耳机，断之。把里面的导线剥出来，然后用示波器的X路表笔勾住耳机线的地和左声道，用示波器的Y路表笔勾住耳机线的地和右声道。将耳机线的另一头接到电脑的声音输出上。</p>
+<p>TODO:接线图?</p>
+<p>打开任意一个音频播放器，播放刚刚我们生成的WAV文件，在示波器上即可显示我们的文字。</p>
+<p>有趣的是，当你调整音量时，示波器上显示的图形会随之进行缩放。另外，如果发现显示的文字有虚化的现象，有可能是我们生成的示波器上的点的位置变化太快，可以尝试每个采样点重复地多生成几遍。TODO: 待验证</p>
+<p>让我们回想一下，刚刚我们做了哪些事情。我们写了一段程序，按照192kHz的采样速率，按照我们的要求生成了WAV文件里的每一个采样点。</p>
+<p>那么，如果我们合理的选择一些点的位置，让这些点代表不同的含意，例如把示波器的屏幕等分成四个区域，点落在各区域里分别代表数字00,01,10,11。那么，我们就可以用声音来传播数字信息了。</p>
+<p>TODO: 补充QPSK的示意图</p>
+<p>事实上，这种思路就是通信系统里常用的QPSK(Quadrature Phase Shift Keying,正交相移键控)的方案。</p>
+<p>更进一步，如果我们对于打出的点的精确度有足够的信心，我们可以把区域分的更多，例如分成16个区域。点落在每个区域里分别表示<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">0000</div><div class="line">0001</div><div class="line">0010</div><div class="line">0011</div><div class="line">0100</div><div class="line">0101</div><div class="line">0110</div><div class="line">0111</div><div class="line">1000</div><div class="line">1001</div><div class="line">1010</div><div class="line">1011</div><div class="line">1100</div><div class="line">1101</div><div class="line">1110</div><div class="line">1111</div></pre></td></tr></table></figure></p>
+<p>这样，我们只需要打出一个点便可以表示更多的数据，这便是16QAM的基本想法。</p>
+<p>实际上BPSK、QPSK、16QAM、64QAM都使用了这种想法，不过在细节上有更多关于实际通信系统实现上的考虑，例如使用改变相位的方式来打出点。</p>
+<h4 id="其它常用的通信概念"><a href="#其它常用的通信概念" class="headerlink" title="其它常用的通信概念"></a>其它常用的通信概念</h4><h5 id="dB-dBm"><a href="#dB-dBm" class="headerlink" title="dB / dBm"></a>dB / dBm</h5><p>dB(decibel)是一个表征相对值的单位。计算方法为</p>
+<p>10×log10(AB)</p>
+<p>一辆卡车的重量是1000Kg，一只背包的重量是1Kg。那么卡车的重量比背包的重量大30dB</p>
+<p>10×log101000Kg1Kg=30dB</p>
+<p>同样，A信号的功率是100W，B信号的功率是1W。那么A信号比B信号功率大20dB</p>
+<p>在无线通信领域里经常会遇到成千上万倍的比例，引入dB的概念之后，工程师们可以免于抄写长串0的苦恼。</p>
+<p>同时，引入dB之后，我们可以把原来的乘法运算变成了加法运算。例如一个可以放大1000倍的功率放大器，我们可以记为30dB放大器；一个把信号衰减一半的衰减器，我们可以记为-3dB衰减器。</p>
+<p>dBm则是将被衡量的功率值与1mW的功率进行比较，30dBm也即1W。</p>
+<p>30dBm=10∗log101W1mW</p>
+<p>在工程中经常用一些估算方法来求概略值，例如：增加3dB = 乘2倍； 减少3dB = 变成1/2 ；增加10dB =乘10倍</p>
+<p>这样便可以直接进行快速运算来求得概略值：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">+3dB= *2</div><div class="line">+6dB= *4    (2*2)</div><div class="line">+7dB= *5    (+10dB-3dB = 10/2)</div><div class="line">+4dB= *2.5  (+10dB-6dB = 10/4)</div><div class="line">+1dB= *1.25 (+4dB-3dB=2.5/2)</div><div class="line">+2dB= *1.6  (+6dBm-4dBm=4/2.5=1.6)</div></pre></td></tr></table></figure></p>
+<p>举个例子，计算47dBm时，40dBm = 104<br>mW，再多7dBm = 5 * 104</p>
+<p>mW = 50W。</p>
+<p>以下的计算读者可以验算一下并把它记忆。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">0 dBm = 1 mW</div><div class="line">10 dBm = 10 mW</div><div class="line">14 dBm = 25 mW</div><div class="line">15 dBm = 32 mW</div><div class="line">16 dBm = 40 mW</div><div class="line">17 dBm = 50 mW</div><div class="line">20 dBm = 100 mW</div><div class="line">30 dBm = 1000 mW = 1W</div></pre></td></tr></table></figure></p>
+<h5 id="IQ采样-复采样"><a href="#IQ采样-复采样" class="headerlink" title="IQ采样 / 复采样"></a>IQ采样 / 复采样</h5><p>I 指的是 in-phase(同相)数据， Q指的是quadrature(正交)data (because the carrier is offset by 90 degrees)</p>
+<p>参考:</p>
+<pre><code>NI: [http://www.ni.com/white-paper/4805/en/](http://www.ni.com/white-paper/4805/en/)
+IQ Data for dummies: [http://whiteboard.ping.se/SDR/IQ](http://whiteboard.ping.se/SDR/IQ)
+[http://www.fourier-series.com/IQMod/](http://www.fourier-series.com/IQMod/)
+</code></pre><p>为什么直接对波形的幅度进行采样不满足要求？而一定要使用IQ采样？</p>
+<h5 id="硬件设计上的考虑"><a href="#硬件设计上的考虑" class="headerlink" title="硬件设计上的考虑"></a>硬件设计上的考虑</h5><p>大部分的通讯系统都使用了调相(PM, Phase Modulation)的调制方式，但是由于硬件设计上的考虑，直接操作一个波形的相位是困难的。</p>
+<p>为了避免直接操作波形的相位，我们使用了以下的想法:</p>
+<p>Asin(2πfct+ϕ)=Acos(ϕ)cos(2πfct)−Asin(ϕ)(2πfct)</p>
+<p>其中，我们令</p>
+<p>I=Acos(ϕ)</p>
+<p>Q=Asin(ϕ)</p>
+<p>这其中使用了和差化积公式:</p>
+<p>cos(α+β)=cos(α)cos(β)−sin(α)sin(β)</p>
+<p>于是，要想改变Asin(2πfct+ϕ)<br>波形的相位ϕ，我们只需要同时改变I和Q之值即可， 然后将I作为幅度乘以cos(2πfct)，将Q作为幅度乘以sin(2πfct)</p>
+<p>，最后将两者相加，即可完成相位的调制。</p>
+<p>这样的做法使得硬件电路上的设计变得简单多了，把对时间的操作变为了对电压的操作，在电路中对时间的精确控制不易，但对电压的精确操作却是容易的。</p>
+<p>在此有一个假定，我们认为所有的真实信号(也就是I)都可以被表示为 当我们取得了一组I,Q之值时，我们不只得到了我们信号的瞬时值，还知道了生成这个信号的函数:</p>
+<p>有一点需要明确，任何发射到空中的信号或者说真实信号都是不存在虚部的。<br>采样率的考虑</p>
+<p>另外，采用IQ采样可以降低每个支路的采样率，如果用幅度检波后的采样率将是其两倍，降低了对ADC(Analog to Digital Converter)的要求。</p>
+<h5 id="本振-LO-Local-Oscillator"><a href="#本振-LO-Local-Oscillator" class="headerlink" title="本振(LO, Local Oscillator)"></a>本振(LO, Local Oscillator)</h5><p>本振频率，英文Local Oscillator。 就是LC振荡器。用在超外差接收机中。超外差接收机中有一个振荡器叫本机振荡器。它产生的高频电磁波与所接收的高频信号混合而产生一个差频，这个差频就是中频。如要接收的信号是900KHZ.本振频率是1365KHZ.两频率混合后就可以产生一个465KHZ或者2265KHZ的差频。接收机中用LC电路选择465KHZ作为中频信号。因为本振频率比外来信号高465KHZ所以叫超外差。</p>
+<p>TODO: FIXME!!</p>
+<h5 id="阻抗匹配"><a href="#阻抗匹配" class="headerlink" title="阻抗匹配"></a>阻抗匹配</h5><h5 id="中频"><a href="#中频" class="headerlink" title="中频"></a>中频</h5><h5 id="变频"><a href="#变频" class="headerlink" title="变频"></a>变频</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cos(ω1t)∗cos(ω2t)= TODO</div></pre></td></tr></table></figure>
+<h5 id="驻波"><a href="#驻波" class="headerlink" title="驻波"></a>驻波</h5><h5 id="噪声系数"><a href="#噪声系数" class="headerlink" title="噪声系数"></a>噪声系数</h5><h5 id="FFT"><a href="#FFT" class="headerlink" title="FFT"></a>FFT</h5><p>FFT(Fast Fourier Transform, 快速傅里叶变换)</p>
+<h5 id="OFDM"><a href="#OFDM" class="headerlink" title="OFDM"></a>OFDM</h5><h4 id="GNURadio及HackRF介绍"><a href="#GNURadio及HackRF介绍" class="headerlink" title="GNURadio及HackRF介绍"></a>GNURadio及HackRF介绍</h4><h4 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h4><h5 id="GNURadio"><a href="#GNURadio" class="headerlink" title="GNURadio"></a>GNURadio</h5><p>Boost</p>
+<h5 id="HackRF"><a href="#HackRF" class="headerlink" title="HackRF"></a>HackRF</h5><p>FIXME: 参考<a href="http://2013.hackitoergosum.org/presentations/Day2-04.HackRF%20A%20Low%20Cost%20Software%20Defined%20Radio%20Platform%20by%20Benjamin%20Vernoux.pdf" target="_blank" rel="external">PDF</a></p>
+<p>FIXME: 参考kickstarter的介绍</p>
+<p>HackRF是一款由Michael Ossmann发起的开源软件无线电外设，旨在从30MHz到6GHz，于2012年从DARPA处拿了一笔经费，制作了500块测试版本Jawbreaker，并向社会分发测试。在经过用户对Jawbreaker的反馈后，作者对硬件板卡做了重新布线，改善了射频性能，这一点我们将会在后文详细讨论。 随后于2013年7月31日至9月4日共计35天的时间，在著名的社会化融资平台Kickstarter上，迅速地获得多达1991人的预订，共预订出价值为$602,960的HackRF One。</p>
+<p>现在已经被gqrx和osmocom-sdr等支持</p>
+<pre><code>全面支持GNURadio
+30MHz – 6GHz
+与RTL2832U(RTLSDR)不同，HackRF可以进行发射
+比USRP更廉价
+最大采样率: 20 Msps (10倍于电视棒RTLSDR)
+接口: High Speed USB
+USB供电
+硬件/软件全部开源
+获得了DARPA的Cyber Fast Track项目的支持
+已经在KickStarter上拿到投资
+</code></pre><p>测试版本Jawbreaker已经不被最新版的固件所支持。</p>
+<h5 id="HackRF-的硬件原理"><a href="#HackRF-的硬件原理" class="headerlink" title="HackRF 的硬件原理"></a>HackRF 的硬件原理</h5><p>TODO: 插图 硬件主要由以下几部分组成</p>
+<pre><code>RFFC5072: 混频器提供80MHz到4200MHz的本振
+MAX2837: 2.3GHz to 2.7GHz 无线宽带射频收发器
+MAX5864: ADC/DAC, 22MHz采样率 8bit
+LPC4320/4330: ARM Cortex M4处理器, 主频204MHz
+Si5351B: I2C可编程任意CMOS时钟生成器，由800MHz分频提供40MHz 50MHz 及采样时钟
+MGA-81563: 0.1–6GHz 3V, 14 dBm 放大器
+SKY13317: 20 MHz-6.0 GHz 射频单刀三掷(SP3T)开关
+SKY13350: 0.01-6.0 GHz 射频单刀双掷(SPDT)开关
+</code></pre><p>以接收过程为例，信号由天线进入后流程如下</p>
+<pre><code>由射频开关决定是否经由14dB的放大器进行放大
+经过镜像抑制滤波器对信号进行高通或低通滤波
+信号进行RFFC5072芯片混频到2.6GHz固定中频
+信号送入MAX2837芯片混频到基带，输出差分的IQ信号
+    其间MAX2837芯片可以对信号进行带宽限制
+MAX5864芯片对基带信号进行数字化后送入CPLD和单片机 TODO FIXME
+CPLD干了什么?
+LPC4320/4330处理器将采样数据通过USB送至计算机
+</code></pre><h5 id="HackRF-One针对Jawbreaker做了哪些改进"><a href="#HackRF-One针对Jawbreaker做了哪些改进" class="headerlink" title="HackRF One针对Jawbreaker做了哪些改进"></a>HackRF One针对Jawbreaker做了哪些改进</h5><pre><code>删除了板载废柴微带天线
+将RFFC5072和MAX2837放入屏蔽罩内保护起来，防止外界及板上其它芯片的干扰，并试图防止静电击穿部分芯片
+重新布局，使得射频连线更紧凑
+</code></pre><p>实际测试过程中，我们发现Jawbreaker中由于布线问题造成的全频谱范围内1MHz为周期出现的小信号干扰，在HackRF One中完全消除。</p>
+<p>TODO: 上对比图</p>
+<h4 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h4><p>本章节介绍如何在Linux环境中搭建GNURadio和HackRF的开发调试平台。</p>
+<h5 id="GNURadio-1"><a href="#GNURadio-1" class="headerlink" title="GNURadio"></a>GNURadio</h5><p>不要使用发行版自带的GNURadio软件包，因为发行版的维护者比较懒，或者说GNURadio的开发者们没有主动向发行版里发布版本。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ wget http://www.sbrac.org/files/build-gnuradio</div><div class="line">$ chmod +x build-gnuradio</div><div class="line">$ ./build-gnuradio -v -ja</div></pre></td></tr></table></figure></p>
+<p>然后在 <code>Proceed?</code> 后面输入 <code>y</code> 回车。在 <code>Do you have SUDO privileges?</code> 提示后面依然输入 <code>y</code> 回车。</p>
+<p>注意，执行 <code>build-gnuradio</code> 脚本的时候，不要预先使用 <code>sudo</code> 。</p>
+<p>加入 <code>-ja</code> 的选项后，使用多核处理器的并行处理能力来编译GNURadio，加快编译速度。整个编译安装过程可能会持续2小时甚至更长的时间，取决于网络速度。因此建议使用比较快的Linux镜像源服务器。</p>
+<p>然后 <code>build-gnuradio</code> 脚本会自动安装所需要的软件包，然后开始安装。</p>
+<p>值得一提的是，<code>build-gnuradio</code> 脚本会自动安装最新版本的hackrf软件。</p>
+<h4 id="HackRF-环境搭建"><a href="#HackRF-环境搭建" class="headerlink" title="HackRF 环境搭建"></a>HackRF 环境搭建</h4><h4 id="应用示例"><a href="#应用示例" class="headerlink" title="应用示例"></a>应用示例</h4><p>Throttle</p>
+<h5 id="FM接收"><a href="#FM接收" class="headerlink" title="FM接收"></a>FM接收</h5><p>gqrx</p>
+<p>另参考<a href="http://binaryrf.com/viewtopic.php?f=9&amp;t=16" target="_blank" rel="external">http://binaryrf.com/viewtopic.php?f=9&amp;t=16</a><br>FM发射<br>DAB发射<br>遥控小车信号解析<br>NOAA卫星接收<br>GSM信号解调<br>HackRF LTE-Cell-Scanner</p>
+<p><a href="http://v.youku.com/v_show/id_XNjc1MjIzMDEy.html" target="_blank" rel="external">http://v.youku.com/v_show/id_XNjc1MjIzMDEy.html</a><br>解析Pocsag Pagers</p>
+<p><a href="http://binaryrf.com/viewtopic.php?f=9&amp;t=8" target="_blank" rel="external">http://binaryrf.com/viewtopic.php?f=9&amp;t=8</a><br>Washington DC HackRF</p>
+<p><a href="http://lukeberndt.com/2013/using-a-hackrf-to-capture-an-entire-radio-system/" target="_blank" rel="external">http://lukeberndt.com/2013/using-a-hackrf-to-capture-an-entire-radio-system/</a></p>
+<p><a href="http://www.openmhz.com/" target="_blank" rel="external">http://www.openmhz.com/</a></p>
+<p>Tech</p>
+<p>There is a lot going on behind this simple looking website. Here is a high level overview of how it works, but shot me an email if you want details.</p>
+<p>The radio signals are received using the HackRF Software Defined Radio (SDR). The SDR receives a wide swath of radio spectrum and passes it to a computer to process and decode. Using this approach, it is possible to receive all of the transmission from the radio system and decode them simultaneously. Without the SDR a separate radio receiver would be need for each channel.</p>
+<p>In a Trunking system, one of the radio channels is set aside for to manage the assignment of radio channels to talkgroups. When someone wants to talk, they send a message on the control channel. The system then assigns them a channel and sends a Channel Grant message on the control channel. This lets the talker know what channel to transmit on and anyone who is a member of the talkgroup know that they should listen to that channel.</p>
+<p>In order to follow all of the transmissions, this system constantly listens to and decodes the control channel. When a channel is granted to a talkgroup, the system creates a monitoring process. This process will start to process and decode the part of the radio spectrum for that channel which the SDR is already pulling in.</p>
+<p>No message is transmitted on the control channel when a talkgroup’s conversation is over. So instead the monitoring process keeps track of transmissions and if there has been no activity for 5 seconds, it ends the recording and uploads to the webserver.</p>
+<p>The monitoring and recording is being run off of a laptop in my apartment and uses a crappy antenna. The website is run off a VPS I have running up in the magical cloud.</p>
+<p>The webserver is pretty simple. It is written in NodeJs. The audio is stored as WAV files and indexed using MongoDB. The server simply watches for new files being placed in a directory and then moves them and adds them to the DB. Socket.io is used to updated all of the browsers visiting the site that a new transmission has been added. See - Easy, Peasy!<br>解析大车的信号</p>
+<p><a href="http://binaryrf.com/viewtopic.php?f=3&amp;t=20" target="_blank" rel="external">http://binaryrf.com/viewtopic.php?f=3&amp;t=20</a> <a href="http://blog.kismetwireless.net/2013/08/playing-with-hackrf-keyfobs.html" target="_blank" rel="external">http://blog.kismetwireless.net/2013/08/playing-with-hackrf-keyfobs.html</a><br>解析FLEX信号<br>Kismet教程</p>
+<p><a href="http://blog.kismetwireless.net/2013/08/hackrf-pt-2-gnuradio-companion-and.html" target="_blank" rel="external">http://blog.kismetwireless.net/2013/08/hackrf-pt-2-gnuradio-companion-and.html</a><br>AIS</p>
+<p>船 161.975MHz or 162.025MHz<br>Bluetooth monitoring<br>wireless microphones<br>DVB<br>DECT手机?</p>
+<p>RFID (Radio Freq Identification)</p>
+<p>Cellular GSM base station</p>
+<p>GPS receiver</p>
+<p>AM/FM Radio TX/RX, APCO-25 (USA) / TETRA (EU) Digital Radio</p>
+<p>Digital Television (ATSC/DVB-T)</p>
+<p>Passive radar<br>1090</p>
+<p>gr-air-modes osmocom modes_gui</p>
+<p>-d, –dcblock Use a DC blocking filter (best for HackRF Jawbreaker) [default=False]<br>通过网络传输IQ数据<br>TV Sharp<br>gr-dvb<br>gr-drm</p>
+<h5 id="GNURadio模块编写示例-遥控小车的信号分析与生成"><a href="#GNURadio模块编写示例-遥控小车的信号分析与生成" class="headerlink" title="GNURadio模块编写示例 - 遥控小车的信号分析与生成"></a>GNURadio模块编写示例 - 遥控小车的信号分析与生成</h5><p>可以参阅<a href="http://gnuradio.org/redmine/projects/gnuradio/wiki/OutOfTreeModules" target="_blank" rel="external">http://gnuradio.org/redmine/projects/gnuradio/wiki/OutOfTreeModules</a></p>
+<h4 id="直接重放"><a href="#直接重放" class="headerlink" title="直接重放"></a>直接重放</h4><p>首先使用频谱仪或者查资料获知其频率在27.145MHz，所以我们取中心频率为27MHz，以8M采样率采回16M个点，时长2秒<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">hackrf_transfer -r car.iq -f 27000000 -s 8000000 -n 16000000</div></pre></td></tr></table></figure></p>
+<p>重放，注意优化它的发射增益<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">hackrf_transfer -t car.iq -f 27000000 -s 8000000 -a 1 -l 30 -i 30 -x 40</div></pre></td></tr></table></figure></p>
+<h4 id="使用GNURadio对采集到的iq进行分析"><a href="#使用GNURadio对采集到的iq进行分析" class="headerlink" title="使用GNURadio对采集到的iq进行分析"></a>使用GNURadio对采集到的iq进行分析</h4><h4 id="控制信号分析结果"><a href="#控制信号分析结果" class="headerlink" title="控制信号分析结果"></a>控制信号分析结果</h4><p>27.145MHz的遥控小车的信号大致可以认为是如下的PPM/AM波形:</p>
+<p>PPM意为Pulse Position Modulation，脉冲位置调制</p>
+<pre><code>                TIME3         TIME4
+--------+    +---------+    +-------+    +--------- ... -------+    +---.....
+        |    |         |    |       |    |                     |    |
+        |    |         |    |       |    |                     |    |
+        |    |         |    |       |    |                     |    |
+        |    |         |    |       |    |                     |    |
+        +----+         +----+       +----+                     +----+
+        TIME0          TIME0        TIME0
+     --&gt;|                                TIME2                 |&lt;---
+</code></pre><p>其中的典型值为 TIME0 = 520us TIME2 = 20ms TIME3,TIME4 = [300us,1.3ms]</p>
+<p>TIME3的时间长度控制了小车的左右 TIME4的时间长度控制了小车的油门量</p>
+<h4 id="用Python生成基带进行原理验证"><a href="#用Python生成基带进行原理验证" class="headerlink" title="用Python生成基带进行原理验证"></a>用Python生成基带进行原理验证</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> struct</div><div class="line"></div><div class="line">SAMP_RATE=<span class="number">8e6</span></div><div class="line">TIME_TOTAL = int(<span class="number">1</span> * SAMP_RATE) <span class="comment">#s</span></div><div class="line"></div><div class="line">TIME0 = int(<span class="number">520e-6</span> * SAMP_RATE)</div><div class="line">TIME10 = int(<span class="number">300e-6</span> * SAMP_RATE)</div><div class="line">TIME11 = int(<span class="number">1.3e-3</span> * SAMP_RATE)</div><div class="line">TIME2 = int(<span class="number">20e-3</span> * SAMP_RATE)</div><div class="line"></div><div class="line">Control0 = <span class="number">0</span> <span class="comment">#[0,1] 0.5 = stop orientation</span></div><div class="line">Control1 = <span class="number">1</span><span class="comment">#speed</span></div><div class="line"></div><div class="line">TIME3 = (TIME11-TIME10) * Control0 + TIME10</div><div class="line">TIME4 = (TIME11-TIME10) * Control1 + TIME10</div><div class="line"></div><div class="line">TIME_REST = TIME2-TIME0*<span class="number">3</span>-TIME3-TIME4</div><div class="line"></div><div class="line">MIN=struct.pack(<span class="string">'B'</span>,<span class="number">128</span>)</div><div class="line">MAX=struct.pack(<span class="string">'B'</span>,<span class="number">255</span>)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">WriteFrame</span><span class="params">(value,quantity,f)</span>:</span></div><div class="line">    j = <span class="number">0</span></div><div class="line">    <span class="keyword">while</span> j &lt; quantity:</div><div class="line">    f.write(value) <span class="comment">#i</span></div><div class="line">    f.write(value) <span class="comment">#q</span></div><div class="line">    j += <span class="number">1</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></div><div class="line">    f = open(<span class="string">'w.iq'</span>,<span class="string">'wb'</span>)</div><div class="line"></div><div class="line">    i = <span class="number">0</span></div><div class="line">    WriteFrame(MAX,<span class="number">1e-3</span>*SAMP_RATE,f)</div><div class="line">    i += <span class="number">1e-3</span>*SAMP_RATE</div><div class="line">    <span class="keyword">while</span> i &lt; TIME_TOTAL:</div><div class="line">    WriteFrame(MIN,TIME0,f)</div><div class="line">    i += TIME0</div><div class="line">    WriteFrame(MAX,TIME3,f)</div><div class="line">    i += TIME3</div><div class="line">    WriteFrame(MIN,TIME0,f)</div><div class="line">    i += TIME0</div><div class="line">    WriteFrame(MAX,TIME4,f)</div><div class="line">    i += TIME4</div><div class="line">    WriteFrame(MIN,TIME0,f)</div><div class="line">    i += TIME0</div><div class="line">    WriteFrame(MAX,TIME_REST,f)</div><div class="line">    i += TIME_REST</div><div class="line">    f.close()        </div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</div><div class="line">    main()</div></pre></td></tr></table></figure>
+<p>然后生成了w.iq的原始基带数据.</p>
+<p>如何查看它是否正确呢？让我们打开gnuradio-companion来做出一个简单的信号流程来调试一下。</p>
+<p>TODO</p>
+<h4 id="写GNURadio模块-第二种车"><a href="#写GNURadio模块-第二种车" class="headerlink" title="写GNURadio模块: 第二种车"></a>写GNURadio模块: 第二种车</h4><h5 id="信号原理分析"><a href="#信号原理分析" class="headerlink" title="信号原理分析"></a>信号原理分析</h5><p>使用gnuradio-companion搭建AM解调，然后输出到WX GUI Scope Sink里，发现信号在27MHz是如下情形:</p>
+<p>+———-+     +———-+     +———-+     +———-+     +—–+     +—–+<br>|          |     |          |     |          |     |          |     |     |     |     |<br>|          |     |          |     |          |     |          |     |     |     |     |<br>|          |     |          |     |          |     |          |     |     |     |     |<br>|          |     |          |     |          |     |          |     |     |     |     |<br>|          |     |          |     |          |     |          |     |     |     |     |<br>|          |     |          |     |          |     |          |     |     |     |     |                 </p>
+<ul>
+<li>+—–+          +—–+          +—–+          +—–+     +—–+     +-…                     </li>
+</ul>
+<p>|&lt;-  3t  -&gt;|  t  |&lt;-  3t  -&gt;|  t  |&lt;-  3t  -&gt;|  t  |&lt;-  3t  -&gt;|  t  |  t  |  t  |  t  |         </p>
+<p>每个控制帧都由4个长脉冲和n个短脉冲组成</p>
+<p>经过测试，找到n的值如下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">左: n=58</div><div class="line">右: n=64</div><div class="line">1档前进: n=10</div><div class="line">2档前进: n=22</div><div class="line">后退: n=40</div><div class="line">1档左前: n=28</div><div class="line">1档右前: n=34</div><div class="line">左后: n=46</div><div class="line">右后: n=52</div></pre></td></tr></table></figure></p>
+<h5 id="模块建立"><a href="#模块建立" class="headerlink" title="模块建立"></a>模块建立</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">$ gr_modtool new remotecar</div><div class="line"></div><div class="line">$ gr_modtool add RemoteCarIIBaseBand -t sync</div><div class="line">GNU Radio module name identified: remotecar</div><div class="line">Language: C++</div><div class="line">Block/code identifier: RemoteCarIIBaseBand</div><div class="line">Enter valid argument list, including default arguments: double samp_rate,bool run, int command</div><div class="line">Add Python QA code? [Y/n] n</div><div class="line">Add C++ QA code? [Y/n] n</div><div class="line">Adding file &apos;RemoteCarIIBaseBand_impl.h&apos;...</div><div class="line">Adding file &apos;RemoteCarIIBaseBand_impl.cc&apos;...</div><div class="line">Adding file &apos;RemoteCarIIBaseBand.h&apos;...</div><div class="line">Editing swig/remotecar_swig.i...</div><div class="line">Adding file &apos;remotecar_RemoteCarIIBaseBand.xml&apos;...</div><div class="line">Editing grc/CMakeLists.txt...</div></pre></td></tr></table></figure>
+<p>写io_signature</p>
+<p>在lib/RemoteCarIIBaseBand_impl.cc文件中:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">RemoteCarIIBaseBand_impl::RemoteCarIIBaseBand_impl(double samp_rate,bool run, int command)</div><div class="line">      : gr::sync_block(&quot;RemoteCarIIBaseBand&quot;,</div><div class="line">          gr::io_signature::make(0,0,0),</div><div class="line">          gr::io_signature::make(1,1,sizeof(float)))</div></pre></td></tr></table></figure></p>
+<p>添加所需变量</p>
+<p>在lib/RemoteCarBaseBand_impl.h里加入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">namespace gr &#123;</div><div class="line">  namespace remotecar &#123;</div><div class="line"></div><div class="line">    class RemoteCarIIBaseBand_impl : public RemoteCarIIBaseBand</div><div class="line">    &#123;</div><div class="line">     private:</div><div class="line">         double d_samp_rate;</div><div class="line">         bool bool_run;</div><div class="line"></div><div class="line">         int n_pre;</div><div class="line">         int n_command;</div><div class="line"></div><div class="line">         int current_pre;</div><div class="line">         int current_command;</div><div class="line"></div><div class="line">         int current_sample_index;</div><div class="line"></div><div class="line">     public:</div><div class="line">      RemoteCarIIBaseBand_impl(double samp_rate,bool run, int command);</div><div class="line">      ~RemoteCarIIBaseBand_impl();</div><div class="line"></div><div class="line">      // Where all the action really happens</div><div class="line">      int work(int noutput_items,</div><div class="line">           gr_vector_const_void_star &amp;input_items,</div><div class="line">           gr_vector_void_star &amp;amp;output_items);</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">  &#125; // namespace remotecar</div><div class="line">&#125; // namespace gr</div><div class="line">    ....</div></pre></td></tr></table></figure></p>
+<h5 id="work"><a href="#work" class="headerlink" title="work"></a>work</h5><p>整个类的生命周期内一直存在， GNURadio的调度器会调用work函数，索取noutput_items个结果</p>
+<h5 id="生成grc"><a href="#生成grc" class="headerlink" title="生成grc"></a>生成grc</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$ gr_modtool makexml RemoteCarIIBaseBand</div><div class="line">GNU Radio module name identified: remotecar</div><div class="line">Warning: This is an experimental feature. Don&apos;t expect any magic.</div><div class="line">Searching for matching files in lib/:</div><div class="line">Making GRC bindings for lib/RemoteCarIIBaseBand_impl.cc...</div><div class="line">Overwrite existing GRC file? [y/N] y</div></pre></td></tr></table></figure>
+<h5 id="grc中On-Off的设置"><a href="#grc中On-Off的设置" class="headerlink" title="grc中On Off的设置"></a>grc中On Off的设置</h5><p>参考: gnuradio/gr-wxgui/grc/wxgui_scopesink2.xml<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">&lt;block&gt;</div><div class="line">  &lt;name&gt;Remotecariibaseband&lt;/name&gt;</div><div class="line">  &lt;key&gt;remotecar_RemoteCarIIBaseBand&lt;/key&gt;</div><div class="line">  &lt;category&gt;REMOTECAR&lt;/category&gt;</div><div class="line">  &lt;import&gt;import remotecar&lt;/import&gt;</div><div class="line">  &lt;make&gt;remotecar.RemoteCarIIBaseBand($samp_rate,$run, $command)&lt;/make&gt;</div><div class="line">  &lt;param&gt;</div><div class="line">    &lt;name&gt;Sample Rate&lt;/name&gt;</div><div class="line">    &lt;key&gt;samp_rate&lt;/key&gt;</div><div class="line">    &lt;type&gt;real&lt;/type&gt;</div><div class="line">  &lt;/param&gt;</div><div class="line">  &lt;param&gt;</div><div class="line">    &lt;name&gt;Run&lt;/name&gt;</div><div class="line">    &lt;key&gt;run&lt;/key&gt;</div><div class="line">    &lt;value&gt;True&lt;/value&gt;</div><div class="line">    &lt;type&gt;bool&lt;/type&gt;</div><div class="line">    &lt;option&gt;</div><div class="line">    &lt;name&gt;Off&lt;/name&gt;</div><div class="line">    &lt;key&gt;False&lt;/key&gt;</div><div class="line">    &lt;/option&gt;</div><div class="line">    &lt;option&gt;</div><div class="line">    &lt;name&gt;On&lt;/name&gt;</div><div class="line">    &lt;key&gt;True&lt;/key&gt;</div><div class="line">    &lt;/option&gt;</div><div class="line">  &lt;/param&gt;</div><div class="line">  &lt;param&gt;</div><div class="line">    &lt;name&gt;Command&lt;/name&gt;</div><div class="line">    &lt;key&gt;command&lt;/key&gt;</div><div class="line">    &lt;type&gt;int&lt;/type&gt;</div><div class="line">  &lt;/param&gt;</div><div class="line">  &lt;source&gt;</div><div class="line">    &lt;name&gt;out&lt;/name&gt;</div><div class="line">    &lt;type&gt;float&lt;/type&gt;</div><div class="line">  &lt;/source&gt;</div><div class="line">&lt;/block&gt;</div></pre></td></tr></table></figure></p>
+<h5 id="Stage-1通关测试"><a href="#Stage-1通关测试" class="headerlink" title="Stage 1通关测试"></a>Stage 1通关测试</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">int</div><div class="line">RemoteCarIIBaseBand_impl::work(int noutput_items,</div><div class="line">          gr_vector_const_void_star &amp;input_items,</div><div class="line">          gr_vector_void_star &amp;output_items)</div><div class="line">&#123;</div><div class="line">float *out = (float *) output_items[0];</div><div class="line"></div><div class="line">for (int i = 0;i &lt; noutput_items; i++)&#123;</div><div class="line">        out[i] = 1.5;</div><div class="line">&#125;</div><div class="line"></div><div class="line">// Tell runtime system how many output items we produced.</div><div class="line">return noutput_items;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="加入基带信号生成部分"><a href="#加入基带信号生成部分" class="headerlink" title="加入基带信号生成部分"></a>加入基带信号生成部分</h5><p>在lib/RemoteCarBaseBand_impl.cc里加入代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div></pre></td><td class="code"><pre><div class="line">RemoteCarIIBaseBand_impl::RemoteCarIIBaseBand_impl(double samp_rate,bool run, int command)</div><div class="line">      : gr::sync_block(&quot;RemoteCarIIBaseBand&quot;,</div><div class="line">          gr::io_signature::make(0,0,0),</div><div class="line">          gr::io_signature::make(1,1,sizeof(float)))</div><div class="line">    &#123;</div><div class="line">    bool_run = run; // output on off</div><div class="line">    d_samp_rate = samp_rate; </div><div class="line"></div><div class="line">    n_command = command; // command code </div><div class="line">    n_pre = 4; // pre pulse number</div><div class="line"></div><div class="line">    current_command = 0;</div><div class="line">    current_pre = 0;</div><div class="line"></div><div class="line">    current_sample_index = 0;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    ...</div><div class="line"></div><div class="line">    int</div><div class="line">    RemoteCarIIBaseBand_impl::work(int noutput_items,</div><div class="line">              gr_vector_const_void_star &amp;input_items,</div><div class="line">              gr_vector_void_star &amp;output_items)</div><div class="line">    &#123;</div><div class="line">    float *out = (float *) output_items[0];</div><div class="line"></div><div class="line">    for (int i = 0;i &lt; noutput_items; i++)&#123;</div><div class="line">            if (bool_run) &#123;</div><div class="line">                    if (current_pre &lt; n_pre) &#123;</div><div class="line">                        if (current_sample_index &lt; d_samp_rate * 0.00055 * 3) &#123;</div><div class="line">                                out[i] = 1;</div><div class="line">                                current_sample_index += 1;</div><div class="line">                        &#125;</div><div class="line">                        else if (current_sample_index &lt; d_samp_rate * 0.00055 * 4)&#123;</div><div class="line">                                out[i] = 0;</div><div class="line">                                current_sample_index += 1;</div><div class="line">                        &#125; else &#123; // a long pre pulse generated.</div><div class="line">                            current_sample_index = 0;</div><div class="line">                            current_pre += 1;</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line">                    else if (current_command &lt; n_command) &#123;</div><div class="line">                        // 4 pre long pulse generated, then generate other short pulse.</div><div class="line">                        if (current_sample_index &lt; d_samp_rate * 0.00055 ) &#123;</div><div class="line">                                out[i] = 1;</div><div class="line">                                current_sample_index += 1;</div><div class="line">                        &#125;</div><div class="line">                        else if (current_sample_index &lt; d_samp_rate * 0.00055 * 2)&#123;</div><div class="line">                                out[i] = 0;</div><div class="line">                                current_sample_index += 1;</div><div class="line">                        &#125; else &#123; // a short command pulse generated</div><div class="line">                            current_sample_index = 0;</div><div class="line">                            current_command += 1;</div><div class="line">                        &#125;</div><div class="line"></div><div class="line">                    &#125;</div><div class="line">                    else &#123;</div><div class="line">                            // 1 frame generated</div><div class="line">                          current_pre = 0;</div><div class="line">                          current_command = 0;</div><div class="line">                          current_sample_index = 0;</div><div class="line">                    &#125;</div><div class="line">            &#125; else &#123; // muted</div><div class="line">                    out[i] = 0;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    // Tell runtime system how many output items we produced.</div><div class="line">    return noutput_items;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<h5 id="回调函数"><a href="#回调函数" class="headerlink" title="回调函数"></a>回调函数</h5><p>如果没有回调函数，那么生成的模块不能在gnuradio-companion里被WX GUI Slider实时的修改参数。</p>
+<p>为了能够实时地控制小车，我们需要加入两个回调函数。</p>
+<p>在lib/RemoteCarBaseBand_impl.h里加入set_run和set_command函数的声明<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">namespace gr &#123;</div><div class="line">  namespace remotecar &#123;</div><div class="line"></div><div class="line">    ....</div><div class="line"></div><div class="line">      // Where all the action really happens</div><div class="line">      int work(int noutput_items,</div><div class="line">           gr_vector_const_void_star &amp;input_items,</div><div class="line">           gr_vector_void_star &amp;amp;output_items);</div><div class="line">      void set_run(bool run);</div><div class="line">      void set_command(int command);</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">  &#125; // namespace remotecar</div><div class="line">&#125; // namespace gr</div><div class="line">    ....</div></pre></td></tr></table></figure></p>
+<p>还需要在include/remotecar/RemoteCarIIBaseBand.h加入set_run和set_command的声明<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">class REMOTECAR_API RemoteCarIIBaseBand : virtual public gr::sync_block</div><div class="line"> &#123;</div><div class="line">  public:</div><div class="line">   typedef boost::shared_ptr&lt;RemoteCarIIBaseBand&gt; sptr;</div><div class="line"></div><div class="line">   static sptr make(double samp_rate,bool run, int command);</div><div class="line">   virtual void set_run(bool run) = 0;</div><div class="line">   virtual void set_command(int command) = 0 ;</div><div class="line"> &#125;;</div></pre></td></tr></table></figure></p>
+<p>在lib/RemoteCarIIBaseBand_impl.cc里加入set_run和set_command的实现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">void RemoteCarIIBaseBand_impl::set_run(bool run) &#123;</div><div class="line">    bool_run = run;</div><div class="line">&#125;</div><div class="line"></div><div class="line">void RemoteCarIIBaseBand_impl::set_command(int command) &#123;</div><div class="line">    n_command = command;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>最后，在grc/remotecar_RemoteCarIIBaseBand.xml文件里加入<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">make</span>&gt;</span>remotecar.RemoteCarIIBaseBand($samp_rate,$run, $command)<span class="tag">&lt;/<span class="name">make</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">callback</span>&gt;</span>set_run($run)<span class="tag">&lt;/<span class="name">callback</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">callback</span>&gt;</span>set_command($command)<span class="tag">&lt;/<span class="name">callback</span>&gt;</span></div><div class="line">....</div></pre></td></tr></table></figure></p>
+<h5 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">mkdir build</div><div class="line">cd build</div><div class="line">cmake ../ &amp;&amp; make &amp;&amp; sudo make install &amp;&amp; sudo ldconfig</div></pre></td></tr></table></figure>
+<p>然后重启gnuradio-companion即可搭建一个简单的示例来跑通小车</p>
+<h5 id="加入一个简单的GUI"><a href="#加入一个简单的GUI" class="headerlink" title="加入一个简单的GUI"></a>加入一个简单的GUI</h5><p>如果觉得这样操作不舒服，我们可以用Qt写一个简单的键盘控制的方向盘。</p>
+<h5 id="gr-modtool-用法概览"><a href="#gr-modtool-用法概览" class="headerlink" title="gr_modtool 用法概览"></a>gr_modtool 用法概览</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">gr_modtool newmod blahblah</div><div class="line">gr_modtool add -t general square_ff</div><div class="line">make test / ctest -V -R blahblah</div><div class="line">gr_modtool add -t sync square2_ff</div><div class="line">set_history()</div><div class="line">input_items.size()  / output_items.size()</div><div class="line">Sync Interpolator</div><div class="line">gr_modtool makexml square2_ff</div><div class="line">forecast()</div><div class="line">gr::sync_block, gr::sync_interpolator or gr::sync_decimator instead of gr::block</div><div class="line">set_output_multiple() 攒够固定倍数才输出</div><div class="line">Hierarchical Block</div><div class="line">    gr_modtool.py add -t hier hierblockcpp_ff</div><div class="line">    Delete blocks from the source tree: gr_modtool rm REGEX</div><div class="line"> Disable blocks by removing them from the CMake files: gr_modtool disable REGEX</div><div class="line">Python: gr_modtool add -t sync -l python square3_ff</div></pre></td></tr></table></figure>
+<h4 id="HackRF硬件分析及射频指标测试"><a href="#HackRF硬件分析及射频指标测试" class="headerlink" title="HackRF硬件分析及射频指标测试"></a>HackRF硬件分析及射频指标测试</h4><h4 id="HackRF硬件分析"><a href="#HackRF硬件分析" class="headerlink" title="HackRF硬件分析"></a>HackRF硬件分析</h4><h5 id="芯片简介"><a href="#芯片简介" class="headerlink" title="芯片简介"></a>芯片简介</h5><h6 id="RFFC5072"><a href="#RFFC5072" class="headerlink" title="RFFC5072"></a>RFFC5072</h6><pre><code>Product Description The RFFC5071 and RFFC5072 are re-configurable frequency conversion devices with integrated fractional-N phased locked loop (PLL) synthesizer, voltage con- trolled oscillator (VCO) and either one or two high linearity mixers. The fractional-N synthesizer takes advantage of an advanced sigma-delta modulator that delivers ultra-fine step sizes and low spurious products. The PLL/VCO engine combined with an external loop filter allows the user to generate local oscillator (LO) signals from 85MHz to 4200MHz. The LO signal is buffered and routed to the integrated RF mix- ers which are used to up/down-convert frequencies ranging from 30MHz to 6000MHz. The mixer bias current is programmable and can be reduced for applica- tions requiring lower power consumption. Both devices can be configured to work as signal sources by bypassing the integrated mixers. Device programming is achieved via a simple 3-wire serial interface. In addition, a unique programming mode allows up to four devices to be controlled from a common serial bus. This eliminates the need for separate chip-select control lines between each device and the host controller. Up to six general purpose outputs are provided, which can be used to access internal signals (the LOCK signal, for example) or to control front end components. Both devices operate with a 2.7V to 3.3V power supply
+</code></pre><h6 id="MAX2837"><a href="#MAX2837" class="headerlink" title="MAX2837"></a>MAX2837</h6><pre><code>The MAX2837 direct-conversion zero-IF RF transceiver is designed specifically for 2.3GHz to 2.7GHz wireless broadband systems. The MAX2837 completely inte- grates all circuitry required to implement the RF trans- ceiver function, providing RF-to-baseband receive path; and baseband-to-RF transmit path, VCO, frequency synthesizer, crystal oscillator, and baseband/control interface. The device includes a fast-settling sigma- delta RF synthesizer with smaller than 20Hz frequency steps and a crystal oscillator, which allows the use of a low-cost crystal in place of a TCXO. The transceiver IC also integrates circuits for on-chip DC offset cancella- tion, I/Q error, and carrier-leakage detection circuits. Only an RF bandpass filter (BPF), crystal, RF switch, PA, and a small number of passive components are needed to form a complete wireless broadband RF radio solution. The MAX2837 completely eliminates the need for an external SAW filter by implementing on-chip monolithic filters for both the receiver and transmitter. The baseband filters along with the Rx and Tx signal paths are optimized to meet stringent noise figure and linearity specifications. The device supports up to 2048 FFT OFDM and imple- ments programmable channel filters for 1.75MHz to 28MHz RF channel bandwidths. The transceiver requires only 2μs Tx-Rx switching time, which includes frequency transient settling. The IC is available in a small, 48-pin thin QFN package measuring only 6mm x 6mm x 0.8mm.
+</code></pre><h6 id="MAX5864"><a href="#MAX5864" class="headerlink" title="MAX5864"></a>MAX5864</h6><pre><code>The MAX5864 ultra-low-power, highly integrated analog front end is ideal for portable communication equipment such as handsets, PDAs, WLAN, and 3G wireless termi- nals. The MAX5864 integrates dual 8-bit receive ADCs and dual 10-bit transmit DACs while providing the high- est dynamic performance at ultra-low power. The ADCs’ analog I-Q input amplifiers are fully differential and accept 1V P-P full-scale signals. Typical I-Q channel phase matching is ±0.1° and amplitude matching is ±0.03dB. The ADCs feature 48.5dB SINAD and 69dBc spurious-free dynamic range (SFDR) at f IN = 5.5MHz and f CLK = 22Msps. The DACs’ analog I-Q outputs are fully differential with ±400mV full-scale output, and 1.4V com- mon-mode level. Typical I-Q channel phase match is ±0.15° and amplitude match is ±0.05dB. The DACs also feature dual 10-bit resolution with 71.7dBc SFDR, and 57dB SNR at f OUT = 2.2MHz and f CLK = 22MHz. The ADCs and DACs operate simultaneously or indepen- dently for frequency-division duplex (FDD) and time-divi- sion duplex (TDD) modes. A 3-wire serial interface controls power-down and transceiver modes of opera- tion. The typical operating power is 42mW at f CLK = 22Msps with the ADCs and DACs operating simultane- ously in transceiver mode. The MAX5864 features an internal 1.024V voltage reference that is stable over the entire operating power-supply range and temperature range. The MAX5864 operates on a +2.7V to +3.3V ana- log power supply and a +1.8V to +3.3V digital I/O power supply for logic compatibility. The quiescent current is 5.6mA in idle mode and 1μA in shutdown mode. The MAX5864 is specified for the extended (-40°C to +85°C) temperature range and is available in a 48-pin thin QFN package.
+</code></pre><h4 id="射频指标概述"><a href="#射频指标概述" class="headerlink" title="射频指标概述"></a>射频指标概述</h4><h4 id="HackRF-射频指标"><a href="#HackRF-射频指标" class="headerlink" title="HackRF 射频指标"></a>HackRF 射频指标</h4><p>最大发射功率 ~ 10dBm 64QAM发射EVM ~ 1.5% 复采样带宽 20MHz</p>
+<h5 id="高级话题"><a href="#高级话题" class="headerlink" title="高级话题"></a>高级话题</h5><h5 id="如何使用两个HackRF"><a href="#如何使用两个HackRF" class="headerlink" title="如何使用两个HackRF"></a>如何使用两个HackRF</h5><p>Here’s a tricky method about duplex.</p>
+<p>If you plug in two hackrf device, hackrf_info will only show one hackrf device.</p>
+<p>But, if you plug in one first, run something with this hackrf to occupy it. Then plug in another hackrf device, then run another program , and the ‘duplex’ works.</p>
+<h5 id="SciPy"><a href="#SciPy" class="headerlink" title="SciPy"></a>SciPy</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">f = scipy.fromfile(open(&quot;myFile.bin&quot;), dtype=scipy.complex64)</div></pre></td></tr></table></figure>
+<p>时钟同步</p>
+<h5 id="手工打造HackRF"><a href="#手工打造HackRF" class="headerlink" title="手工打造HackRF"></a>手工打造HackRF</h5><p>大约需要2天造一块<br>如何对HackRF进行刷机</p>
+<h5 id="对HackRF做贡献"><a href="#对HackRF做贡献" class="headerlink" title="对HackRF做贡献"></a>对HackRF做贡献</h5><p>报Bug</p>
+<p>提交补丁</p>
+<p><a href="https://github.com/mossmann/hackrf/pull/108" target="_blank" rel="external">https://github.com/mossmann/hackrf/pull/108</a></p>
+<p>HackRF One外壳设计</p>
+<h5 id="Grid-Positioning"><a href="#Grid-Positioning" class="headerlink" title="Grid Positioning"></a>Grid Positioning</h5><p><a href="http://gnuradio.org/redmine/projects/gnuradio/wiki/GNURadioCompanion#Grid-Positioning" target="_blank" rel="external">http://gnuradio.org/redmine/projects/gnuradio/wiki/GNURadioCompanion#Grid-Positioning</a></p>
+<h6 id="message-source"><a href="#message-source" class="headerlink" title="message source"></a>message source</h6><p><a href="http://gnuradio.org/redmine/projects/gnuradio/wiki/TutorialsCoreConcepts#Streams-vs-Messages-Passing-PDUs" target="_blank" rel="external">http://gnuradio.org/redmine/projects/gnuradio/wiki/TutorialsCoreConcepts#Streams-vs-Messages-Passing-PDUs</a></p>
+<h5 id="PPM校准"><a href="#PPM校准" class="headerlink" title="PPM校准"></a>PPM校准</h5><p>简单的方法: 找一个已知的FM频率，在gqrx直接修改ppm，直到该FM电台的标称频率刚好与实际值一致<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kalibrate_rtl</div></pre></td></tr></table></figure></p>
+<p>滤波器</p>
+<h5 id="KiCAD-图形Diff"><a href="#KiCAD-图形Diff" class="headerlink" title="KiCAD 图形Diff"></a>KiCAD 图形Diff</h5><p>compare image1 image2 -compose src diff.png compare image1 image2 -compose src diff.pdf</p>
+<p>另: 由pdf提取png convert example.pdf -density 300 example.png 其中300为DPI数值</p>
+<p>或</p>
+<p>diffpdf</p>
+<h5 id="串扰问题"><a href="#串扰问题" class="headerlink" title="串扰问题"></a>串扰问题</h5><p>经常会在FM收听时发现某台(例如103.9MHz)，在103.9M+采样频率，例如103.9+8 = 111.9MHz处有一个镜像台</p>
+<p>此外,</p>
+<pre><code>It looks like you’re getting the hang of it, but here is an answer to your earlier question about how to predict the bad spurs.
+The IF is the intermediate frequency the MAX2837 is tuned to. The RF is the radio frequency of interest at the antenna port. The LO is the local oscillator frequency of the RFFC5072. (Technically there is another LO in the MAX2837, but it is the same frequency as IF. When I refer to LO, I am talking about the LO in the RFFC5072.)
+RF = |IF+LO| or RF = |IF - LO|
+Which one (the sum or the difference) depends on the configuration of the image reject filter stage.
+Bad spurs occur when LO or an integer multiple of LO is within 10 MHz (or half of your baseband filter bandwidth) of RF. This happens due to leakage of the LO into the RF side of the RFFC5072.
+Bad spurs occur when LO or an integer multiple of LO is within 10 MHz (or half of your baseband filter bandwidth) of IF. This happens due to leakage of the LO into the IF side of the RFFC5072.
+To be safe, it is probably best to keep LO harmonics 20 MHz or further away from RF or IF. Right now our automatic tuning code (which is already fairly complicated) does not take LO leakage into account.
+</code></pre><h5 id="DC-Offset"><a href="#DC-Offset" class="headerlink" title="DC Offset"></a>DC Offset</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line">DC Removal</div><div class="line">    DC Blocker</div><div class="line">    osmocom source: DC OFFSET</div><div class="line">DC Blocker</div><div class="line"></div><div class="line">HackRF Jawbreaker性能分析</div><div class="line">GNURadio Scheduler 调度</div><div class="line">gcc-arm-none-eabi</div><div class="line">HackRF开发环境搭建</div><div class="line">    gcc-arm-none-eabi</div><div class="line">    DFU</div><div class="line">DFU</div><div class="line">GNURadio写模块</div><div class="line">    gr-modtool</div><div class="line">osmocom模块分析</div><div class="line">HackRF One vs Jawbreaker</div><div class="line"></div><div class="line">gqrx代码分析</div><div class="line">hackrf usb代码分析</div><div class="line">    opencm3</div><div class="line">KiCAD</div><div class="line">代码分析</div><div class="line">    gqrx代码分析</div><div class="line">    hackrf usb代码分析</div><div class="line">        opencm3</div><div class="line">SMT贴装</div><div class="line">手工制造/制造工艺</div><div class="line">    KiCAD</div><div class="line">    SMT贴装</div><div class="line">    QFN封装及介绍</div><div class="line">    PCB工艺</div><div class="line">QFN封装及介绍</div><div class="line">PCB工艺</div><div class="line">PyBombs</div><div class="line"></div><div class="line">osmocom source: DC OFFSET</div><div class="line">rtlsdr</div><div class="line">Raspberry Pi / ARMv6h</div><div class="line">嵌入式系统跑</div><div class="line">    Raspberry Pi / ARMv6h</div><div class="line">    ODroid /ARMv7h</div><div class="line">ODroid /ARMv7h</div><div class="line"></div><div class="line">kalibrate_rtl</div><div class="line">HackRF on Android平板</div></pre></td></tr></table></figure>
+<h5 id="RF-IF-干扰"><a href="#RF-IF-干扰" class="headerlink" title="RF IF 干扰"></a>RF IF 干扰</h5><p>参阅</p>
+<p>并参阅files/WhySpurExists</p>
+<p>example: Center = 1277MHz IF = 2560MHz</p>
+<p>1283 - 1277 = 6</p>
+<p>When Sampling Rate = 20M: Spur = 1283MHz = 2560 - 1277</p>
+<p>When Sampling Rate = 8M: 1277 + 8/2 = 1281 &lt; 1283 so it is sub sampling: Spur = 1277 - [ 8 - (1283 - 1277) ]= 1277 - 2 = 1275 M</p>
+<p>NOTE: the spur can be filtered by MAX2837 bandwidth filter.</p>
+<p>When Sampling Rate = 10M: 1277 + 10/2 = 1282 &lt; 1283 sub sampling: Spur = 1277 - [10 - (1283 - 1277)] = 1277 - 4 = 1273</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    BG7EZY
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://bg7ezy.github.io/2017/10/19/Hackrf-入门/" title="Hackrf 入门">https://bg7ezy.github.io/2017/10/19/Hackrf-入门/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/27/Ubuntu-16-04-iptables设置/" rel="next" title="Ubuntu 16.04 iptables设置">
+                <i class="fa fa-chevron-left"></i> Ubuntu 16.04 iptables设置
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="hypercomments_widget"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <img class="site-author-image" itemprop="image"
+              src="http://img.hb.aicdn.com/a5dc9816e8c828d214151e4e4a3987090c966a1a2ad3c-WU5i7W_fw658"
+              alt="BG7EZY" />
+          
+            <p class="site-author-name" itemprop="name">BG7EZY</p>
+            <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives/">
+            
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">24</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bg7ezy" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>GitHub</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:bg7ezy@163.com" target="_blank" title="E-Mail">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#软件行业的先进内容"><span class="nav-number">2.</span> <span class="nav-text">软件行业的先进内容</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#开源-GPL"><span class="nav-number">3.</span> <span class="nav-text">开源, GPL</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#无线电"><span class="nav-number">4.</span> <span class="nav-text">无线电</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#为什么我们需要开源软件无线电"><span class="nav-number">5.</span> <span class="nav-text">为什么我们需要开源软件无线电?</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#结语"><span class="nav-number">6.</span> <span class="nav-text">结语</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Hello-World-快速上手"><span class="nav-number">7.</span> <span class="nav-text">Hello, World. 快速上手</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HackRF的FM广播接收"><span class="nav-number">8.</span> <span class="nav-text">HackRF的FM广播接收</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#在Windows系统"><span class="nav-number">8.1.</span> <span class="nav-text">在Windows系统</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Linux系统"><span class="nav-number">8.2.</span> <span class="nav-text">Linux系统</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#osmocom-fft-osmocom-siggen"><span class="nav-number">9.</span> <span class="nav-text">osmocom_fft osmocom_siggen</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#FM-广播的发射"><span class="nav-number">10.</span> <span class="nav-text">FM 广播的发射</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#WAV-Source"><span class="nav-number">10.1.</span> <span class="nav-text">WAV Source</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Stream-Mux"><span class="nav-number">10.2.</span> <span class="nav-text">Stream Mux</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Osmocom-Sink"><span class="nav-number">10.3.</span> <span class="nav-text">Osmocom Sink</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#遥控小车的重放"><span class="nav-number">11.</span> <span class="nav-text">遥控小车的重放</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#预备知识"><span class="nav-number">11.1.</span> <span class="nav-text">预备知识</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CW-莫尔斯码"><span class="nav-number">12.</span> <span class="nav-text">CW / 莫尔斯码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#业余无线电"><span class="nav-number">13.</span> <span class="nav-text">业余无线电</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#gMFSK"><span class="nav-number">14.</span> <span class="nav-text">gMFSK</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DTMF"><span class="nav-number">15.</span> <span class="nav-text">DTMF</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#声卡示波器"><span class="nav-number">16.</span> <span class="nav-text">声卡示波器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#其它常用的通信概念"><span class="nav-number">17.</span> <span class="nav-text">其它常用的通信概念</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#dB-dBm"><span class="nav-number">17.1.</span> <span class="nav-text">dB / dBm</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#IQ采样-复采样"><span class="nav-number">17.2.</span> <span class="nav-text">IQ采样 / 复采样</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#硬件设计上的考虑"><span class="nav-number">17.3.</span> <span class="nav-text">硬件设计上的考虑</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#本振-LO-Local-Oscillator"><span class="nav-number">17.4.</span> <span class="nav-text">本振(LO, Local Oscillator)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#阻抗匹配"><span class="nav-number">17.5.</span> <span class="nav-text">阻抗匹配</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#中频"><span class="nav-number">17.6.</span> <span class="nav-text">中频</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#变频"><span class="nav-number">17.7.</span> <span class="nav-text">变频</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#驻波"><span class="nav-number">17.8.</span> <span class="nav-text">驻波</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#噪声系数"><span class="nav-number">17.9.</span> <span class="nav-text">噪声系数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#FFT"><span class="nav-number">17.10.</span> <span class="nav-text">FFT</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#OFDM"><span class="nav-number">17.11.</span> <span class="nav-text">OFDM</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#GNURadio及HackRF介绍"><span class="nav-number">18.</span> <span class="nav-text">GNURadio及HackRF介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#背景"><span class="nav-number">19.</span> <span class="nav-text">背景</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#GNURadio"><span class="nav-number">19.1.</span> <span class="nav-text">GNURadio</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#HackRF"><span class="nav-number">19.2.</span> <span class="nav-text">HackRF</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#HackRF-的硬件原理"><span class="nav-number">19.3.</span> <span class="nav-text">HackRF 的硬件原理</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#HackRF-One针对Jawbreaker做了哪些改进"><span class="nav-number">19.4.</span> <span class="nav-text">HackRF One针对Jawbreaker做了哪些改进</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#环境搭建"><span class="nav-number">20.</span> <span class="nav-text">环境搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#GNURadio-1"><span class="nav-number">20.1.</span> <span class="nav-text">GNURadio</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HackRF-环境搭建"><span class="nav-number">21.</span> <span class="nav-text">HackRF 环境搭建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#应用示例"><span class="nav-number">22.</span> <span class="nav-text">应用示例</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#FM接收"><span class="nav-number">22.1.</span> <span class="nav-text">FM接收</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#GNURadio模块编写示例-遥控小车的信号分析与生成"><span class="nav-number">22.2.</span> <span class="nav-text">GNURadio模块编写示例 - 遥控小车的信号分析与生成</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#直接重放"><span class="nav-number">23.</span> <span class="nav-text">直接重放</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用GNURadio对采集到的iq进行分析"><span class="nav-number">24.</span> <span class="nav-text">使用GNURadio对采集到的iq进行分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#控制信号分析结果"><span class="nav-number">25.</span> <span class="nav-text">控制信号分析结果</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#用Python生成基带进行原理验证"><span class="nav-number">26.</span> <span class="nav-text">用Python生成基带进行原理验证</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#写GNURadio模块-第二种车"><span class="nav-number">27.</span> <span class="nav-text">写GNURadio模块: 第二种车</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#信号原理分析"><span class="nav-number">27.1.</span> <span class="nav-text">信号原理分析</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#模块建立"><span class="nav-number">27.2.</span> <span class="nav-text">模块建立</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#work"><span class="nav-number">27.3.</span> <span class="nav-text">work</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#生成grc"><span class="nav-number">27.4.</span> <span class="nav-text">生成grc</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#grc中On-Off的设置"><span class="nav-number">27.5.</span> <span class="nav-text">grc中On Off的设置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Stage-1通关测试"><span class="nav-number">27.6.</span> <span class="nav-text">Stage 1通关测试</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#加入基带信号生成部分"><span class="nav-number">27.7.</span> <span class="nav-text">加入基带信号生成部分</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#回调函数"><span class="nav-number">27.8.</span> <span class="nav-text">回调函数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#编译"><span class="nav-number">27.9.</span> <span class="nav-text">编译</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#加入一个简单的GUI"><span class="nav-number">27.10.</span> <span class="nav-text">加入一个简单的GUI</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#gr-modtool-用法概览"><span class="nav-number">27.11.</span> <span class="nav-text">gr_modtool 用法概览</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HackRF硬件分析及射频指标测试"><span class="nav-number">28.</span> <span class="nav-text">HackRF硬件分析及射频指标测试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HackRF硬件分析"><span class="nav-number">29.</span> <span class="nav-text">HackRF硬件分析</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#芯片简介"><span class="nav-number">29.1.</span> <span class="nav-text">芯片简介</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#RFFC5072"><span class="nav-number">29.1.1.</span> <span class="nav-text">RFFC5072</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#MAX2837"><span class="nav-number">29.1.2.</span> <span class="nav-text">MAX2837</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#MAX5864"><span class="nav-number">29.1.3.</span> <span class="nav-text">MAX5864</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#射频指标概述"><span class="nav-number">30.</span> <span class="nav-text">射频指标概述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HackRF-射频指标"><span class="nav-number">31.</span> <span class="nav-text">HackRF 射频指标</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#高级话题"><span class="nav-number">31.1.</span> <span class="nav-text">高级话题</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#如何使用两个HackRF"><span class="nav-number">31.2.</span> <span class="nav-text">如何使用两个HackRF</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#SciPy"><span class="nav-number">31.3.</span> <span class="nav-text">SciPy</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#手工打造HackRF"><span class="nav-number">31.4.</span> <span class="nav-text">手工打造HackRF</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#对HackRF做贡献"><span class="nav-number">31.5.</span> <span class="nav-text">对HackRF做贡献</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Grid-Positioning"><span class="nav-number">31.6.</span> <span class="nav-text">Grid Positioning</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#message-source"><span class="nav-number">31.6.1.</span> <span class="nav-text">message source</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#PPM校准"><span class="nav-number">31.7.</span> <span class="nav-text">PPM校准</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#KiCAD-图形Diff"><span class="nav-number">31.8.</span> <span class="nav-text">KiCAD 图形Diff</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#串扰问题"><span class="nav-number">31.9.</span> <span class="nav-text">串扰问题</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#DC-Offset"><span class="nav-number">31.10.</span> <span class="nav-text">DC Offset</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#RF-IF-干扰"><span class="nav-number">31.11.</span> <span class="nav-text">RF IF 干扰</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BG7EZY</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.2</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客 </i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站点击量 </i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+		<script type="text/javascript">
+		_hcwp = window._hcwp || [];
+
+		_hcwp.push({widget:"Bloggerstream", widget_id: 94943, selector:".hc-comment-count", label: "{\%COUNT%\}" });
+
+		
+		_hcwp.push({widget:"Stream", widget_id: 94943, xid: "2017/10/19/Hackrf-入门/"});
+		
+
+		(function() {
+		if("HC_LOAD_INIT" in window)return;
+		HC_LOAD_INIT = true;
+		var lang = (navigator.language || navigator.systemLanguage || navigator.userLanguage || "en").substr(0, 2).toLowerCase();
+		var hcc = document.createElement("script"); hcc.type = "text/javascript"; hcc.async = true;
+		hcc.src = ("https:" == document.location.protocol ? "https" : "http")+"://w.hypercomments.com/widget/hc/94943/"+lang+"/widget.js";
+		var s = document.getElementsByTagName("script")[0];
+		s.parentNode.insertBefore(hcc, s.nextSibling);
+		})();
+		</script>
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="前言本教程基本属于原创，经验之谈，不过也有一些素材来自网络，本人对此不负任何责任。这个教程介于入门和进阶之间，也就是说比如简单一点的像：rom的大体结构啊、android的基本原理啊、linux的基本操作啊。这个教程都一概略过。而比较深入的像：apk的修改、开发，源代码的修改、编写，smali插桩，移植适配其他非官方机型。这也一概没有。 本教程仅介绍如何利用MIUI放出的patchrom资源完成编">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[教程]如何利用patchrom来编译你自己的MIUI">
+<meta property="og:url" content="https://bg7ezy.github.io/2017/09/04/教程-如何利用patchrom来编译你自己的MIUI/index.html">
+<meta property="og:site_name" content="BG7EZY&#39;S BLOG">
+<meta property="og:description" content="前言本教程基本属于原创，经验之谈，不过也有一些素材来自网络，本人对此不负任何责任。这个教程介于入门和进阶之间，也就是说比如简单一点的像：rom的大体结构啊、android的基本原理啊、linux的基本操作啊。这个教程都一概略过。而比较深入的像：apk的修改、开发，源代码的修改、编写，smali插桩，移植适配其他非官方机型。这也一概没有。 本教程仅介绍如何利用MIUI放出的patchrom资源完成编">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-10-19T06:30:54.359Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[教程]如何利用patchrom来编译你自己的MIUI">
+<meta name="twitter:description" content="前言本教程基本属于原创，经验之谈，不过也有一些素材来自网络，本人对此不负任何责任。这个教程介于入门和进阶之间，也就是说比如简单一点的像：rom的大体结构啊、android的基本原理啊、linux的基本操作啊。这个教程都一概略过。而比较深入的像：apk的修改、开发，源代码的修改、编写，smali插桩，移植适配其他非官方机型。这也一概没有。 本教程仅介绍如何利用MIUI放出的patchrom资源完成编">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://bg7ezy.github.io/2017/09/04/教程-如何利用patchrom来编译你自己的MIUI/"/>
+
+
+
+
+
+  <title>[教程]如何利用patchrom来编译你自己的MIUI | BG7EZY'S BLOG</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">BG7EZY'S BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">没有什么能够阻挡，我对自由的向往。</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/baidusitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://bg7ezy.github.io/2017/09/04/教程-如何利用patchrom来编译你自己的MIUI/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="BG7EZY">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://img.hb.aicdn.com/a5dc9816e8c828d214151e4e4a3987090c966a1a2ad3c-WU5i7W_fw658">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="BG7EZY'S BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">[教程]如何利用patchrom来编译你自己的MIUI</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-04T15:30:47+08:00">
+                2017-09-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+            <!--noindex-->
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/09/04/教程-如何利用patchrom来编译你自己的MIUI/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count hc-comment-count" data-xid="2017/09/04/教程-如何利用patchrom来编译你自己的MIUI/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+              <!--/noindex-->
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"><span></span><span>阅读</span></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+      <p style="color: #FFA500;font-size=16px"><span>转自: </span><a href="http://www.miui.com/thread-842680-1-1.html" target="_blank">http://www.miui.com/thread-842680-1-1.html</a></p>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h5 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h5><p>本教程基本属于原创，经验之谈，不过也有一些素材来自网络，本人对此不负任何责任。这个教程介于入门和进阶之间，也就是说比如简单一点的像：rom的大体结构啊、android的基本原理啊、linux的基本操作啊。这个教程都一概略过。而比较深入的像：apk的修改、开发，源代码的修改、编写，smali插桩，移植适配其他非官方机型。这也一概没有。</p>
+<p>本教程仅介绍如何利用MIUI放出的patchrom资源完成编译MIUI的流程，适用于对自制rom以及linux有一定了解，喜欢miui，喜欢DIY，但不太熟悉如何使用patchrom以及其基本流程的发烧友<br>如果你对android、linux完全是一个门外汉的话，这个教程对你来说可能会有不少无法理解的地方。而如果你如果已经是大神了，希望多多指点，跟大家交流一下你的经验<br><a id="more"></a></p>
+<h5 id="介绍一些基本概念"><a href="#介绍一些基本概念" class="headerlink" title="介绍一些基本概念"></a>介绍一些基本概念</h5><p>首先介绍几个比较基本教程的链接</p>
+<ol>
+<li>MIUI官方提供的教程：<a href="http://www.miui.com/thread-402322-1-1.html" target="_blank" rel="external">http://www.miui.com/thread-402322-1-1.html</a></li>
+<li>CM官方wiki上的CM编译教程：<a href="http://wiki.cyanogenmod.org/index.php?title=Build_Guides" target="_blank" rel="external">http://wiki.cyanogenmod.org/index.php?title=Build_Guides</a></li>
+<li>android官方提供的AOSP编译教程：<a href="http://source.android.com/source/initializing.html" target="_blank" rel="external">http://source.android.com/source/initializing.html</a></li>
+</ol>
+<p>要学习利用开源源代码编译android rom的话，看完后面两个基本就够了，CM、PA这类的rom都可以根据CM的编译方法来编译，而AOKP这类的rom可以根据AOSP的编译方法来编译<br>大部分开源rom在他们的github上也会写上相关的编译流程以及主要的命令，比如PA除了用CM的编译方法手动输入每条命令来编译，也可以直接运行他们写好的build.sh来进行编译，基本上还是以实际文件和github上写明的流程为准<br>而MIUI当然跟这两种的编译方法都不一样，因为MIUI不是利用android源代码编译出来的，而是反编译现成的rom，修改相关smali来适配各种机型的，所以MIUI自己配置了一套编译平台，这也就是patchrom项目<br>都知道，android是基于linux内核的，而且谷歌也并没有提供适用于windows平台进行编译的相关代码和工具，所以要从源代码编译android是需要一个linux环境的</p>
+<p>虽然谷歌同样也支持在苹果的mac系统上编译，但一方面mac的环境配置较为复杂，另一方面mac用户不如pc用户多，要装mac也远不如装linux方便，所以搞这个的，大部分人都是使用的linux<br>而基于linux内核的操作系统其实有很多，这些不同的linux系统也叫Linux发行版，最主流最常见最通用的一个版本，就是ubuntu(我个人是opensuse党，也在opensuse上编译过CM、MIUI，不过opensuse相对更复杂，而ubuntu现成的软件也更多更方便一点，所以这个教程里是使用的64位ubuntu 12.10来介绍的)，而因此也有很多基于ubuntu修改的Linux发行版，比如深度的Linux Deepin和雨林木风的StartOS，所以相对来说，不论是原版ubuntu还是Linux Deepin和StartOS都比较适合刚接触linux的新手使用</p>
+<p>以下所有输入命令的行为全是在“终端”程序中进行的，下文可能会有多处省略，所以你看到输命令可别问输在哪</p>
+<h5 id="编译环境的搭建"><a href="#编译环境的搭建" class="headerlink" title="编译环境的搭建"></a>编译环境的搭建</h5><p>我本来是使用的12.04，64位桌面版，后来12.10出来了，就顺着更新上来了，因为我这里运营商强制上网得用他的拨号软件，所以我是在虚拟机里搭建的，其实我是推荐直接装在真机上，这样性能更好，编译速度也更快。ubuntu版本的选择、下载、安装、更换源、系统更新等等，我就不介绍了，网上教程一堆一堆的,在装好了ubuntu之后，我们就要开始android rom编译的环境配置了，大致的说一下，需要下载的文件总共有五步</p>
+<h6 id="编译依赖"><a href="#编译依赖" class="headerlink" title="编译依赖"></a>编译依赖</h6><p>第一步就是编译依赖的各种软件包，这类东西要是打个比方的话大概就相当于是windows下的一些常用的运行库以及基本的编程软件，因为我是既有编译MIUI，也有编译CM这类的rom的需求，所以没单独挑出MIUI所需要的软件包，而是把我所有安装了的软件包都列出来了：</p>
+<p>每个都得装的基本软件包(这个是我自己根据CM的教程和aosp的教程里提到的整理出来的)：git-core gnupg flex bison gperf libsdl1.2-dev libesd0-dev libwxgtk2.8-dev squashfs-tools build-essential zip curl libncurses5-dev zlib1g-dev pngcrush schedtool libc6-dev x11proto-core-dev libx11-dev libreadline6-dev libgl1-mesa-dev g++-multilib mingw32 tofrodos python-markdown libxml2-utils xsltproc</p>
+<p>libncurse5软件包，根据系统版本二选一，文件名跟你的系统版本正好相反：<br>lib32ncurses5-dev（如果你是64位的系统，就是安装这个）<br>lib64ncurses5-dev（如果你是32位的系统，就是安装这个）</p>
+<p>libreadline6软件包，同上：<br>lib32readline6-dev<br>lib64readline6-dev</p>
+<p>lib32z1-dev这个是64位装的，因为我没试过32位的系统，所以不知道32位要不要(有没有)lib64z1-dev这个软件包</p>
+<p>你既可以使用<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo apt-get install 软件包1名称 软件包2名称 软件包3名称</div></pre></td></tr></table></figure></p>
+<p>这个命令在“终端”中批量下载、安装以上软件包，也可以在“ubuntu软件中心”中下载一个“新立得软件包管理器”，用它来选择安装</p>
+<h6 id="安装JDK环境"><a href="#安装JDK环境" class="headerlink" title="安装JDK环境"></a>安装JDK环境</h6><p>第二步就是安装java/jdk了，我是偷懒，直接通过新立得安装“openjdk-6-jdk”这个openjdk6的软件包，如果你不怕麻烦，可以去下载、安装sun的原版jdk，这个网上也是一堆教程，我就不多说明了</p>
+<h6 id="安装Android-SDK-platform-tools"><a href="#安装Android-SDK-platform-tools" class="headerlink" title="安装Android SDK platform-tools"></a>安装Android SDK platform-tools</h6><p>第三步安装Android SDK，Android SDK是android官方提供的一套软件开发套件，里面有很多实用工具，比如adb、fastboot、zipalign，还有被很多人称为android模拟器的功能，先在<a href="http://developer.android.com/sdk/index.html页面根据系统版本下载压缩包，选linux版就行了，下载完成后，解压到“主文件夹”下面，这个“主文件夹”类似于windows的我的文档，不过更像是我的文档的上一级目录，就像是" target="_blank" rel="external">http://developer.android.com/sdk/index.html页面根据系统版本下载压缩包，选linux版就行了，下载完成后，解压到“主文件夹”下面，这个“主文件夹”类似于windows的我的文档，不过更像是我的文档的上一级目录，就像是</a><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">C:\Users\用户名\</div></pre></td></tr></table></figure></p>
+<p>这个目录，而“主文件夹”在linux下的路径是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/home/用户名</div></pre></td></tr></table></figure></p>
+<p>或者也可以用<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">~</div></pre></td></tr></table></figure></p>
+<p>符号来表示</p>
+<p>而我们在SDK网站上下载的zip并不包含全部的SDK文件，所以需要打开SDK的管理窗口进行下载，打开tools文件夹，双击android这个文件，选择第一项“在终端中运行”或者第四项“运行”都没有问题，两个选一个就是了(运行之前请事先装好jdk，不然点完之后的窗口就会打不开或者一闪而过)，在弹出的这个SDK管理器窗口中，如图，正在连接谷歌服务器获取文件列表(如果卡住不动，说明服务器被墙了，请自行翻墙)，待获取完毕后，默认是会勾上最新版本的安卓镜像，去掉前面的勾(想在电脑上玩玩安卓模拟器的可以留着)，我们只需要勾上Android SDK Tools和Android SDK Platform-tools，这两个就行了，然后点右下角那个Install packages…的按钮(图上那个按钮因为窗口太小，文字没显示全，你知道是那个就行了)，待下载、安装完毕后，一层层关闭Android SDK的所有窗口，回到“主文件夹”，在左上角菜单的“查看”菜单里，选中“显示隐藏文件”，也可以用Ctrl+H这个快捷键快速打开，找到<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">.bashrc</div></pre></td></tr></table></figure></p>
+<p>这个文件，双击打开，拉到最后一行，回车，输入一行定义Android SDK工具的路径的环境变量的代码，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">export PATH=$&#123;PATH&#125;:路径/tools:路径/platform-tools</div></pre></td></tr></table></figure></p>
+<p>比如图上，我的用户名是shiro，sdk我是解压在“主文件夹”下的，所以把sdk的路径填入代码，我输入的就是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">export PATH=$&#123;PATH&#125;:/home/shiro/android-sdk-linux/tools:/home/shiro/android-sdk-linux/platform-tools</div></pre></td></tr></table></figure></p>
+<p>保存，退出，这行代码只对当前用户有效，注销系统，或者重启系统之后，代码就会生效，输这个代码的意义就在于，如果你没有定义sdk的路径，那以后你要运行adb命令，你就得在终端里切换到/home/shiro/android-sdk-linux/platform-tools目录下或者在adb前面加上这个路径，然后才能运行adb命令，而加入了这行代码之后，无论你的终端当前在哪个目录，只要输入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">adb</div></pre></td></tr></table></figure></p>
+<p>这个三个字母就相当于直接使用adb命令了</p>
+<h6 id="创建工作目录"><a href="#创建工作目录" class="headerlink" title="创建工作目录"></a>创建工作目录</h6><p>第四步创建工作目录，并安装repo工具，在终端中输入如下两个命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mkdir -p ~/bin</div><div class="line">mkdir -p ~/MIUI</div></pre></td></tr></table></figure></p>
+<p>这样就会在“主文件夹”下新建“bin”和“MIUI”文件夹了，然后再在终端中输入这两个命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">curl https://dl-ssl.google.com/dl/googlesource/git-repo/repo &gt; ~/bin/repo</div><div class="line">chmod a+x ~/bin/repo</div></pre></td></tr></table></figure></p>
+<p>这样就会把repo工具下载到“bin”文件夹下面，并且赋予repo执行命令的权限</p>
+<p>解释一下，“bin”文件夹是为了方便不同用户单独设置不同的命令而创建的，是跟着那一个用户走的，这样你就可以直接在终端中输入repo命令，而不需要切换目录或者前面加上路径了，如果系统上有多个用户，那就意味着这个命令的设置就只对你一个用户有效，其他用户如果要运行就得切换到这个目录或者前面加上路径了，设置“bin”文件夹的目的就跟前面设置sdk的路径的环境变量是一样的，为了输命令的时候少打一段路径，对于“bin”文件夹内的文件编辑是立即生效的，但文件的增减，比如下载了repo工具进来之后，同样要注销系统或者重启系统之后，才会生效</p>
+<p>而这个新建的“MIUI”文件夹，就是我们要把MIUI发布的资源文件下载下来，以后进行编译等操作的主目录了，你也可以把命令里的MIUI改成别的名字，只要上面输的命令和下面要输的命令都统一改成一样的就行了，patchrom的github上的说明是新建了一个叫“patchrom”的文件夹，跟我们这里新建的“MIUI”文件夹都是一样的，随后，在终端中使用下面的命令，进入MIUI文件夹，并使用repo工具初始化这个patchrom项目<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd ~/MIUI</div><div class="line">repo init -u git://github.com/MiCode/patchrom.git -b ics</div></pre></td></tr></table></figure></p>
+<p>这时”MIUI”文件夹下面就会生成一个“.repo”文件夹，并且终端里会提示你配置用户名、邮箱和提示颜色，根据提示选择跳过不配置就好了，对了，<a href="https://github.com/MiCode/patchrom就是MIUI的patchrom项目的网址，而https://github.com/MiCode是整个MiCode的主页，里面就有很多MIUI的开源项目" target="_blank" rel="external">https://github.com/MiCode/patchrom就是MIUI的patchrom项目的网址，而https://github.com/MiCode是整个MiCode的主页，里面就有很多MIUI的开源项目</a></p>
+<h6 id="同步源码"><a href="#同步源码" class="headerlink" title="同步源码"></a>同步源码</h6><p>第五步开始同步MIUI的patchrom项目，确保你在“MIUI”文件夹下，执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">repo sync</div></pre></td></tr></table></figure></p>
+<p>这个命令，repo就会根据.repo/manifest.xml里的内容，下载这个项目所包含的各个子项目了<br>这里说一下，repo工具是一个基于git命令的android专门的项目管理工具，只要配置好了manifest的xml，就可以通过这个工具批量进行多个git项目的操作，比如我们用的patchrom官方的这个，就是一次性下载完build manifest android honor i9100 lt18i sensation onex p1 miui tools i9300 ones razr lt26i vivo x515m saga所有的这么多个项目，对于MIUI的patchrom来说，这个patchrom项目就是manifest的所在，而CM则是以android项目为manifest的所在，而AOSP则是platform/manifest了<br>而值得提醒的是，git不支持断点续传，也就是说如果你在用repo或者git下载某一个项目时，中断了，那以前下载的文件就没用了，会残留在那浪费硬盘空间，然后下次再执行命令就重新下载，所以我推荐尽量一次性下完项目的所有文件，或者挑需要的项目下载<br>而我们需要的几个项目只有build manifest android miui tools以及你需要编译的机型的那一个项目，例如我修改过的patchrom项目的github地址是<a href="https://github.com/ymdzq/patchrom，我专门给dhd移植，并需要ds和is的文件，所以我就把其他的机型都去掉，只要下ace" target="_blank" rel="external">https://github.com/ymdzq/patchrom，我专门给dhd移植，并需要ds和is的文件，所以我就把其他的机型都去掉，只要下ace</a> saga vivo这三个机型的项目就行了，如果你想自己去掉没用的项目，比如不用的机型，那就可以编辑“.repo/manifest.xml”把里面相应的那一行给去掉，保存<br>以后每次要更新项目的时候，只需要在“MIUI”文件夹下，执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">repo sync</div></pre></td></tr></table></figure></p>
+<p>这个命令就会把“MIUI”文件夹下面的所有项目同步到最新版本了</p>
+<h5 id="编译的主体"><a href="#编译的主体" class="headerlink" title="编译的主体"></a>编译的主体</h5><p>这里先简单的介绍一下patchrom下面的各个子项目：</p>
+<ol>
+<li>build - MIUI制作的用来负责指导整个编译过程的几个核心文件的所在，还有几个framework的apk，以及四个常用的签名文件</li>
+<li>manifest - patchrom项目本身，负责告诉repo工具你有哪些个子项目</li>
+<li>android - MIUI把AOSP的framework和经过他们修改过之后的framework源代码进行的对比，这个项目对编译本身用处不大，主要是为给其他机型移植MIUI的大神提供参考，知道源代码和MIUI做了哪些修改就可以从smali插桩中反着推应该怎么去移植，这个工作难度较高，所以给MIUI适配第三方机型的，我估计民间大神中除了华为的格诺大大以外几乎没有什么人会去自己这样适配其他机型，而还干这种事的像明大，就都是小米的工程师了</li>
+<li>honor - 华为 荣耀1的机型项目</li>
+<li>i9100 - 三星 Galaxy S II的机型项目</li>
+<li>lt18i - 索尼 Xperia arc S的机型项目</li>
+<li>sensation - HTC Sensation(G14/G18)的机型项目</li>
+<li>onex - HTC One X的机型项目</li>
+<li>p1 - 华为 Ascend P1的机型项目</li>
+<li>miui - MIUI放出的所有资源文件，包括App的apk本身、Framework的jar和apk本身，framework和app的相关的src(但很可惜是资源文件而不是源代码，也就是说是用于反编译插桩的资源文件，而不是像CM、AOSP那样可以直接编译出程序的源代码)，以及data(将要预装在手机中的程序，比如支付宝、游戏中心、搜狗输入法、在线视频、语音助手，未来可能会有更多)</li>
+<li>tools  - MIUI提供的各种工具，非常齐全，应有尽有，很多工具在编译过程中都会被脚本自动使用到，而且也有制作ota包的工具、apktool、baksmali、smali、mkbootimg、unpackbootimg、signapk等等rom修改者经常单独使用的工具</li>
+<li>i9300 - 三星 Galaxy S III的机型项目</li>
+<li>ones - HTC One S的机型项目</li>
+<li>razr - Moto Razr的机型项目</li>
+<li>lt26i - 索尼 Xperia S的机型项目</li>
+<li>vivo - HTC Incredible S(G11)的机型项目</li>
+<li>x515m - HTC Evo 3D(G17)的机型项目</li>
+<li>saga - HTC Desire S(G12)的机型项目</li>
+</ol>
+<p>MiCode的页面上还有很多后来的其他机型的项目，这里就不一一介绍了，反正很好认，根据需要同步下来就是了</p>
+<p>这里说明一下编译MIUI大概的原理的流程：</p>
+<ol>
+<li>首先你输入编译命令</li>
+<li>根据build项目里的核心文件来针对机型项目里给各个机型适配所修改的文件、设定的规则</li>
+<li>把机型项目文件夹中的作为移植base的stockrom打包成zip</li>
+<li>并将zip中的app和framework单独解压出来</li>
+<li>在out文件夹中调用tools里面的工具和linux系统当中的各种工具进行反编译，应用机型项目中所修改的文件、设定的规则，回编译</li>
+<li>输出到target_files文件夹中的对应目录里，并加入recovery、radio、boot、meta等等的相应信息</li>
+<li>完成后，打包生成target_files.zip，这个zip就是用于制作ota增量升级包的原文件</li>
+<li>再从target_files文件夹中提取system、data、meta、boot等文件到ZIP文件夹中，针对system中的app和framework进行签名</li>
+<li>将完成签名之后的ZIP文件夹打包，这样就得到了fullota.zip，这个就是我们说的MIUI完整包，放进手机用recovery刷的zip刷机包</li>
+</ol>
+<p>至此，MIUI编译的流程就结束了</p>
+<p>了解了流程之后，咱们就开始具体的编译吧<br>首先，切换到MIUI文件夹下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cd ~/MIUI</div></pre></td></tr></table></figure></p>
+<p>前面说过，我们进行编译等操作的主目录就是这了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">. build/envsetup.sh</div></pre></td></tr></table></figure></p>
+<p>用这个命令，在主目录下，运行build文件夹中的envsetup.sh脚本，以初始化编译环境，因为每个人的机器不同，MIUI主目录的位置也不尽相同，所以MIUI所有的工具、规则都是用的相对路径，以主目录为准来向上向下推导各个项目的目录，所以envsetup.sh脚本就是用来设定各种变量、确定主目录的路径用的，这个命令很重要，如果你要利用tools里的工具，比如签名apk、制作ota升级包等等，都要事先运行一下这个命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cd /home/shiro/MIUI/ace</div></pre></td></tr></table></figure></p>
+<p>我这里的机型项目是以HTC DHD为例，我上面这个命令就是切换进ace的目录，你需要把命令中的路径改成你需要编译的机型的项目路径</p>
+<p>输入下面这个命令之后<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">make fullota</div></pre></td></tr></table></figure></p>
+<p>复制代码<br>编译就开始了，经过上面我概述的编译流程，最后等到出现英文提示你编译完成之后，打开机型文件夹里面的out文件夹，比如我的是/home/shiro/MIUI/ace/out，里面就能找到fullota.zip和target_files.zip了</p>
+<h5 id="其他的一些说明"><a href="#其他的一些说明" class="headerlink" title="其他的一些说明"></a>其他的一些说明</h5><p>从头开始说吧，首先一个,编译对电脑配置（CPU、内存、硬盘速度这三样）要求比较高，虽然patchrom是通过反编译插桩，而不是像CM、AOSP那样通过源代码编译生成目标文件，所以运算量相对较小，但运算量比其日常使用还是比较大的，MIUI开发组他们都是I7的台式机，所以你如果是笔记本的话CPU怎么也得有I5或者同类的产品，台式机起码也得是五年之内的相对中高配置<br>内存容量最低4G，推荐6G到8G，越高当然是越好，我是12G内存，所以给4G内存给虚拟机也一样游刃有余，如果只有4G内存的，建议还是不要用虚拟机，直接真机装linux比较好，因为MIUI的签名工具由配置文件设定的默认阀值是4G，所以如果你内存太小，一来很慢，二来很可能会中途失败<br>硬盘的话也不是谁都买得起固态硬盘，笔记本本来速度也不快，编译的时候尽量不要执行其他复制文件或者占用磁盘速度的操作，台式机相对好不少，倒是可以比较随意</p>
+<p>搭环境时装的那些软件包不是每个都会派上用场，编译MIUI要用到的不多，不过如果你都装好了之后也没啥坏处，要是有兴趣编译CM、AOSP这类rom的话就可以不用再装了</p>
+<p>jdk是选择sun的还是openjdk的这个看喜好，不过openjdk必须是1.6版，sun的原版也必须是jdk6（jdk1.6），不要去下openjdk1.7、jdk7（jdk1.7），这个不是越新就越好，安卓2.3到4.1就盯准了要jdk6（jdk1.6）或者openjdk1.6才能编译，所以顺着它就好了</p>
+<p>adb命令在linux上需要设置udev才能使用，不然会提示没有权限的，不过在编译本身的过程中是不会用到adb命令的，所以也无所谓，如果你有使用adb命令的需要的话，这个百度一下就好了</p>
+<p>说一件很重要的事，在编译MIUI之前，需要用MIUI/tools/aapt这个文件覆盖掉sdk里platform-tools文件夹下的同名文件，因为MIUI从新编译过了aapt这个文件，很多miui的资源都依赖这个新版的aapt，如果不覆盖的话，编译时就会默认使用sdk里的老版aapt而导致反编译、回编译失败，中断编译</p>
+<p>如果你编译完了rom，想要清理机型目录下生成出来的新文件，只需把<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">make fullota</div></pre></td></tr></table></figure></p>
+<p>换成<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">make clean</div></pre></td></tr></table></figure></p>
+<p>这样下次执行编译命令的时候就相当于是完全重新编译了</p>
+<p>关于ota升级包的制作，可以参考@TOMMY 的帖子<a href="http://www.miui.com/thread-509838-1-1.html" target="_blank" rel="external">http://www.miui.com/thread-509838-1-1.html</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    BG7EZY
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://bg7ezy.github.io/2017/09/04/教程-如何利用patchrom来编译你自己的MIUI/" title="[教程]如何利用patchrom来编译你自己的MIUI">https://bg7ezy.github.io/2017/09/04/教程-如何利用patchrom来编译你自己的MIUI/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/04/Hexo-自动添加转载标签/" rel="next" title="Hexo 自动添加转载标签">
+                <i class="fa fa-chevron-left"></i> Hexo 自动添加转载标签
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/07/搭建简单GIT服务器/" rel="prev" title="搭建简单GIT服务器">
+                搭建简单GIT服务器 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="hypercomments_widget"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <img class="site-author-image" itemprop="image"
+              src="http://img.hb.aicdn.com/a5dc9816e8c828d214151e4e4a3987090c966a1a2ad3c-WU5i7W_fw658"
+              alt="BG7EZY" />
+          
+            <p class="site-author-name" itemprop="name">BG7EZY</p>
+            <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives/">
+            
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">24</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bg7ezy" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>GitHub</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:bg7ezy@163.com" target="_blank" title="E-Mail">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#介绍一些基本概念"><span class="nav-number">2.</span> <span class="nav-text">介绍一些基本概念</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#编译环境的搭建"><span class="nav-number">3.</span> <span class="nav-text">编译环境的搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#编译依赖"><span class="nav-number">3.1.</span> <span class="nav-text">编译依赖</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#安装JDK环境"><span class="nav-number">3.2.</span> <span class="nav-text">安装JDK环境</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#安装Android-SDK-platform-tools"><span class="nav-number">3.3.</span> <span class="nav-text">安装Android SDK platform-tools</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#创建工作目录"><span class="nav-number">3.4.</span> <span class="nav-text">创建工作目录</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#同步源码"><span class="nav-number">3.5.</span> <span class="nav-text">同步源码</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#编译的主体"><span class="nav-number">4.</span> <span class="nav-text">编译的主体</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#其他的一些说明"><span class="nav-number">5.</span> <span class="nav-text">其他的一些说明</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BG7EZY</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.2</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客 </i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站点击量 </i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+		<script type="text/javascript">
+		_hcwp = window._hcwp || [];
+
+		_hcwp.push({widget:"Bloggerstream", widget_id: 94943, selector:".hc-comment-count", label: "{\%COUNT%\}" });
+
+		
+		_hcwp.push({widget:"Stream", widget_id: 94943, xid: "2017/09/04/教程-如何利用patchrom来编译你自己的MIUI/"});
+		
+
+		(function() {
+		if("HC_LOAD_INIT" in window)return;
+		HC_LOAD_INIT = true;
+		var lang = (navigator.language || navigator.systemLanguage || navigator.userLanguage || "en").substr(0, 2).toLowerCase();
+		var hcc = document.createElement("script"); hcc.type = "text/javascript"; hcc.async = true;
+		hcc.src = ("https:" == document.location.protocol ? "https" : "http")+"://w.hypercomments.com/widget/hc/94943/"+lang+"/widget.js";
+		var s = document.getElementsByTagName("script")[0];
+		s.parentNode.insertBefore(hcc, s.nextSibling);
+		})();
+		</script>
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="squid,过滤,代理," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="透明代理的意思是客户端不需要知道有代理服务器的存在，也不需要有设置代理的操作，它改变你的request fields(报文)，并会传送真实IP。 什么时候用透明代理？squid正向代理其实我一直都在用，在局域网做个缓存服务器常用网站的加载速度会有明显提升，我主要还是为了在应用层过滤广告，可是移动设备设置代理又比较麻烦，一个网段下的其他人也不能受益，这种情况就可以搞起 “透明代理了“ 。">
+<meta name="keywords" content="squid,过滤,代理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="squid透明代理之应用层广告过滤">
+<meta property="og:url" content="https://bg7ezy.github.io/2017/09/18/squid透明代理之应用层广告过滤/index.html">
+<meta property="og:site_name" content="BG7EZY&#39;S BLOG">
+<meta property="og:description" content="透明代理的意思是客户端不需要知道有代理服务器的存在，也不需要有设置代理的操作，它改变你的request fields(报文)，并会传送真实IP。 什么时候用透明代理？squid正向代理其实我一直都在用，在局域网做个缓存服务器常用网站的加载速度会有明显提升，我主要还是为了在应用层过滤广告，可是移动设备设置代理又比较麻烦，一个网段下的其他人也不能受益，这种情况就可以搞起 “透明代理了“ 。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://qiananhua.com/wp-content/uploads/2017/08/WechatIMG9-262x300.jpeg">
+<meta property="og:image" content="https://qiananhua.com/wp-content/uploads/2017/08/WechatIMG2111.jpeg">
+<meta property="og:image" content="https://qiananhua.com/wp-content/uploads/2017/08/WechatIMG2102-300x271.jpeg">
+<meta property="og:image" content="https://qiananhua.com/wp-content/uploads/2017/08/WechatIMG2101-300x271.jpeg">
+<meta property="og:image" content="https://qiananhua.com/wp-content/uploads/2017/08/WechatIMG2103-300x271.jpeg">
+<meta property="og:updated_time" content="2017-10-19T06:30:54.359Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="squid透明代理之应用层广告过滤">
+<meta name="twitter:description" content="透明代理的意思是客户端不需要知道有代理服务器的存在，也不需要有设置代理的操作，它改变你的request fields(报文)，并会传送真实IP。 什么时候用透明代理？squid正向代理其实我一直都在用，在局域网做个缓存服务器常用网站的加载速度会有明显提升，我主要还是为了在应用层过滤广告，可是移动设备设置代理又比较麻烦，一个网段下的其他人也不能受益，这种情况就可以搞起 “透明代理了“ 。">
+<meta name="twitter:image" content="https://qiananhua.com/wp-content/uploads/2017/08/WechatIMG9-262x300.jpeg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://bg7ezy.github.io/2017/09/18/squid透明代理之应用层广告过滤/"/>
+
+
+
+
+
+  <title>squid透明代理之应用层广告过滤 | BG7EZY'S BLOG</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">BG7EZY'S BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">没有什么能够阻挡，我对自由的向往。</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/baidusitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://bg7ezy.github.io/2017/09/18/squid透明代理之应用层广告过滤/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="BG7EZY">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://img.hb.aicdn.com/a5dc9816e8c828d214151e4e4a3987090c966a1a2ad3c-WU5i7W_fw658">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="BG7EZY'S BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">squid透明代理之应用层广告过滤</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-18T11:19:57+08:00">
+                2017-09-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index">
+                    <span itemprop="name">Linux</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/squid/" itemprop="url" rel="index">
+                    <span itemprop="name">squid</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            <!--noindex-->
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/09/18/squid透明代理之应用层广告过滤/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count hc-comment-count" data-xid="2017/09/18/squid透明代理之应用层广告过滤/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+              <!--/noindex-->
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"><span></span><span>阅读</span></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>透明代理的意思是客户端不需要知道有代理服务器的存在，也不需要有设置代理的操作，它改变你的request fields(报文)，并会传送真实IP。</p>
+<h5 id="什么时候用透明代理？"><a href="#什么时候用透明代理？" class="headerlink" title="什么时候用透明代理？"></a>什么时候用透明代理？</h5><p>squid正向代理其实我一直都在用，在局域网做个缓存服务器常用网站的加载速度会有明显提升，我主要还是为了在应用层过滤广告，可是移动设备设置代理又比较麻烦，一个网段下的其他人也不能受益，这种情况就可以搞起 “透明代理了“ 。<br><a id="more"></a></p>
+<p>当然如果想了解局域网内的其他人都上了哪些不可告人的网站，刷朋友圈浏览了哪些照片。这时squid相当于是个中间人，对于裸奔的http请求，那绝对毫无隐私可言啊，结合一些日志分析工具譬如awstats，可以很直观的了解局域网内设备的浏览行文，当然这一切对于客户端是透明的无感知的。这也是为什么现在如此推崇ssl的原因了。对于https squid 其实也是可以解析的，就是比较麻烦这个后面再说。</p>
+<h5 id="准备物料"><a href="#准备物料" class="headerlink" title="准备物料"></a>准备物料</h5><p>树莓派，我这用的树莓派2b+；</p>
+<p>路由器，华为pro；</p>
+<h5 id="Squid"><a href="#Squid" class="headerlink" title="Squid"></a>Squid</h5><h6 id="squid安装过程不表仅贴一下编译参数，具体可参见官方文档"><a href="#squid安装过程不表仅贴一下编译参数，具体可参见官方文档" class="headerlink" title="squid安装过程不表仅贴一下编译参数，具体可参见官方文档"></a>squid安装过程不表仅贴一下编译参数，具体可参见官方文档</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">./configure --prefix=/usr/local/squid \</div><div class="line">--enable-gnuregex \</div><div class="line">--disable-carp \</div><div class="line">--enable-async-io=240 \</div><div class="line">--with-pthreads \</div><div class="line">--enable-storeio=ufs,aufs,diskd \</div><div class="line">--disable-wccp \</div><div class="line">--enable-icmp \</div><div class="line">--enable-kill-parent-hack \</div><div class="line">--enable-cachemgr-hostname=Raspi \</div><div class="line">--with-maxfd=65535 \</div><div class="line">--enable-poll \</div><div class="line">--enable-Linux-netfilter \ #透明代理必需</div><div class="line">--enable-large-cache-files \</div><div class="line">--disable-ident-lookups \</div><div class="line">--enable-default-hostsfile=/etc/hosts \</div><div class="line">--with-dl \</div><div class="line">--with-large-files \</div><div class="line">--enable-delay-pools \</div><div class="line">--enable-snmp \</div><div class="line">--disable-internal-dns \</div><div class="line">--enable-underscore \</div><div class="line">--enable-arp-acl</div></pre></td></tr></table></figure>
+<h6 id="SSL中间人"><a href="#SSL中间人" class="headerlink" title="SSL中间人"></a>SSL中间人</h6><p>当然你如果想让squid承担中间人重新加密的任务（就是解析https数据拉），就需要增加以下两个参数了，让squid支持sslbump和动态证书生成，但是这种方式仅支持正向代理。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">--with-openssl</div><div class="line">--enable-ssl-crtd</div></pre></td></tr></table></figure></p>
+<p>具体可以参照以下官方文档：<br><a href="http://wiki.squid-cache.org/Features/SslBump" target="_blank" rel="external">http://wiki.squid-cache.org/Features/SslBump</a><br><a href="http://wiki.squid-cache.org/Features/DynamicSslCert" target="_blank" rel="external">http://wiki.squid-cache.org/Features/DynamicSslCert</a><br><a href="http://wiki.squid-cache.org/Features/MimicSslServerCert" target="_blank" rel="external">http://wiki.squid-cache.org/Features/MimicSslServerCert</a></p>
+<h6 id="squid装好后有几个关键配置"><a href="#squid装好后有几个关键配置" class="headerlink" title="squid装好后有几个关键配置"></a>squid装好后有几个关键配置</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">vim /usr/local/squid/etc/squid.conf</div><div class="line">http_port 3128 transparent #开启透明代理支持</div><div class="line">cache_mem 128 MB</div><div class="line">logformat combined %&gt;a %ui %un [%tl] &quot;%rm %ru HTTP/%rv&quot; %Hs %&lt;st &quot;%&#123;Referer&#125;&gt;h&quot; &quot;%&#123;User-Agent&#125;&gt;h&quot; %Ss:%Sh #combined格式输出日志，后面awstats统计用</div><div class="line">access_log /data/logs/squid/access.log combined #后面awstats统计要用到</div><div class="line">cache_log /data/logs/squid/cache.log</div><div class="line"> </div><div class="line">#广告过滤</div><div class="line">error_directory /usr/local/squid/share/errors/en-us/ #指定错误信息语言，我这里是英文（广告请求拦截后的转发页面也放这里）</div><div class="line">acl deny_url dstdom_regex &quot;/usr/local/squid/etc/acl/deny_url.acl&quot; #广告url列表，github上有很多如 https://github.com/vokins/yhosts</div><div class="line">deny_info 410:ERR_URL deny_url #ERR_URL是error_directory目录下面的错误文件，可以是文本或者html文件。 http_access deny deny_url</div></pre></td></tr></table></figure>
+<h6 id="squid常用命令"><a href="#squid常用命令" class="headerlink" title="squid常用命令"></a>squid常用命令</h6><pre><code>/usr/local/squid/sbin/squid -z #重建缓存
+/usr/local/squid/sbin/squid #启动
+/usr/local/squid/sbin/squid -k reconfigure #重载配置文件
+</code></pre><p>如果一切顺利此时squid的透明代理已经支持。</p>
+<h5 id="DHCP"><a href="#DHCP" class="headerlink" title="DHCP"></a>DHCP</h5><p>但是要让整个局域网使用透明代理，还需让客户端的网关地址是squid服务器的地址，网关地址在普通路由器上是没法自定义的。<br>你可以关闭路由器的dhcp功能，路由器就当ap来使用，在树莓派上搭建一个dhcp服务，这里用的是isc-dhcp-server</p>
+<p>apt-get直接安装<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">apt-get install isc-dhcp-server</div></pre></td></tr></table></figure></p>
+<p>编辑配置文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">vim /etc/dhcp/dhcpd.conf</div><div class="line">subnet 10.0.0.0 netmask 255.255.255.0 &#123;</div><div class="line">  range 10.0.0.10 10.0.0.100;</div><div class="line">  option domain-name-servers 180.76.76.76;</div><div class="line">  option domain-name &quot;qiananhua.com&quot;;</div><div class="line">  option routers 10.0.0.2; #squid主机地址</div><div class="line">  #option broadcast-address 10.0.0.255;</div><div class="line">  default-lease-time 86400;</div><div class="line">  max-lease-time 172800;</div><div class="line">&#125;</div><div class="line">service isc-dhcp-server restart</div></pre></td></tr></table></figure></p>
+<p>断开wifi重新连接即可。</p>
+<h5 id="iptables"><a href="#iptables" class="headerlink" title="iptables"></a>iptables</h5><p>最后一步让经过squid服务器网卡的http 80端口流量用squid服务的3128端口处理</p>
+<p>转发<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">iptables -t nat -A PREROUTING -s 10.0.0.0/24 -p tcp --dport 80 -j REDIRECT --to-port 3128</div></pre></td></tr></table></figure></p>
+<p>如果一切顺利此时打开 www.163.com 你看到的页面应该是这样的</p>
+<p><img src="https://qiananhua.com/wp-content/uploads/2017/08/WechatIMG9-262x300.jpeg" alt=""></p>
+<h5 id="awstats"><a href="#awstats" class="headerlink" title="awstats"></a>awstats</h5><p>安装比较简单如图所示</p>
+<p><img src="https://qiananhua.com/wp-content/uploads/2017/08/WechatIMG2111.jpeg" alt=""></p>
+<p>配置文件需要指定LogFile为squid日志文件地址<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">vim /etc/awstats/awstats.squid.conf</div><div class="line">LogFile=&quot;/data/logs/squid/access.log&quot;</div></pre></td></tr></table></figure></p>
+<p>手动生成下结果页面-dir=指定生成到nginx配置的虚拟主机根目录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/usr/local/awstats/tools/awstats_buildstaticpages.pl -update -config=squid -lang=cn -dir=/data/htdocs/awstats -awstatsprog=/usr/local/awstats/wwwroot/cgi-bin/awstats.pl</div></pre></td></tr></table></figure></p>
+<p>当然也可以吧这条命令放到.sh文件里添加到crontab自动执行，比如每30分钟执行一次统计<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">*/30 * * * * /data/shell/awstats.sh &gt; /dev/null 2&gt;&amp;1</div></pre></td></tr></table></figure></p>
+<p>接着nginx添加一个awstats的虚拟主机<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">vim /usr/local/nginx/conf/vhosts/awstats.conf</div><div class="line">server &#123;</div><div class="line">    listen 80;</div><div class="line">    server_name awstats;</div><div class="line">    access_log /data/logs/nginx/awstats.log;</div><div class="line">    root /data/htdocs/awstats;</div><div class="line">        index awstats.squid.html;</div><div class="line"> </div><div class="line">    location ~ ^/icon/&#123;</div><div class="line">            root /usr/local/awstats/wwwroot;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>注意本地修改下host，不出意外你会看到以下页面（最后一张图http状态吗410就是被过滤的广告链接了，占比还挺大）<br><img src="https://qiananhua.com/wp-content/uploads/2017/08/WechatIMG2102-300x271.jpeg" alt=""></p>
+<p><img src="https://qiananhua.com/wp-content/uploads/2017/08/WechatIMG2101-300x271.jpeg" alt=""></p>
+<p><img src="https://qiananhua.com/wp-content/uploads/2017/08/WechatIMG2103-300x271.jpeg" alt=""></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    BG7EZY
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://bg7ezy.github.io/2017/09/18/squid透明代理之应用层广告过滤/" title="squid透明代理之应用层广告过滤">https://bg7ezy.github.io/2017/09/18/squid透明代理之应用层广告过滤/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/squid/" <i class="fa fa-tag"></i> squid</a>
+          
+            <a href="/tags/过滤/" <i class="fa fa-tag"></i> 过滤</a>
+          
+            <a href="/tags/代理/" <i class="fa fa-tag"></i> 代理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/13/在Linux中的使用ss命令检查套接字-网络连接/" rel="next" title="在Linux中的使用ss命令检查套接字 网络连接">
+                <i class="fa fa-chevron-left"></i> 在Linux中的使用ss命令检查套接字 网络连接
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/27/Ubuntu-16-04-iptables设置/" rel="prev" title="Ubuntu 16.04 iptables设置">
+                Ubuntu 16.04 iptables设置 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="hypercomments_widget"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <img class="site-author-image" itemprop="image"
+              src="http://img.hb.aicdn.com/a5dc9816e8c828d214151e4e4a3987090c966a1a2ad3c-WU5i7W_fw658"
+              alt="BG7EZY" />
+          
+            <p class="site-author-name" itemprop="name">BG7EZY</p>
+            <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives/">
+            
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">24</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bg7ezy" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>GitHub</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:bg7ezy@163.com" target="_blank" title="E-Mail">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#什么时候用透明代理？"><span class="nav-number">1.</span> <span class="nav-text">什么时候用透明代理？</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#准备物料"><span class="nav-number">2.</span> <span class="nav-text">准备物料</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Squid"><span class="nav-number">3.</span> <span class="nav-text">Squid</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#squid安装过程不表仅贴一下编译参数，具体可参见官方文档"><span class="nav-number">3.1.</span> <span class="nav-text">squid安装过程不表仅贴一下编译参数，具体可参见官方文档</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#SSL中间人"><span class="nav-number">3.2.</span> <span class="nav-text">SSL中间人</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#squid装好后有几个关键配置"><span class="nav-number">3.3.</span> <span class="nav-text">squid装好后有几个关键配置</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#squid常用命令"><span class="nav-number">3.4.</span> <span class="nav-text">squid常用命令</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#DHCP"><span class="nav-number">4.</span> <span class="nav-text">DHCP</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#iptables"><span class="nav-number">5.</span> <span class="nav-text">iptables</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#awstats"><span class="nav-number">6.</span> <span class="nav-text">awstats</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BG7EZY</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.2</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客 </i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站点击量 </i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+		<script type="text/javascript">
+		_hcwp = window._hcwp || [];
+
+		_hcwp.push({widget:"Bloggerstream", widget_id: 94943, selector:".hc-comment-count", label: "{\%COUNT%\}" });
+
+		
+		_hcwp.push({widget:"Stream", widget_id: 94943, xid: "2017/09/18/squid透明代理之应用层广告过滤/"});
+		
+
+		(function() {
+		if("HC_LOAD_INIT" in window)return;
+		HC_LOAD_INIT = true;
+		var lang = (navigator.language || navigator.systemLanguage || navigator.userLanguage || "en").substr(0, 2).toLowerCase();
+		var hcc = document.createElement("script"); hcc.type = "text/javascript"; hcc.async = true;
+		hcc.src = ("https:" == document.location.protocol ? "https" : "http")+"://w.hypercomments.com/widget/hc/94943/"+lang+"/widget.js";
+		var s = document.getElementsByTagName("script")[0];
+		s.parentNode.insertBefore(hcc, s.nextSibling);
+		})();
+		</script>
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
