@@ -322,6 +322,172 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://bg7ezy.github.io/2017/11/10/centos6-5做网关路由器详细实现方法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="BG7EZY">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://img.hb.aicdn.com/a5dc9816e8c828d214151e4e4a3987090c966a1a2ad3c-WU5i7W_fw658">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="BG7EZY'S BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/10/centos6-5做网关路由器详细实现方法/" itemprop="url">centos6.5做网关路由器详细实现方法</a></h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-10T14:15:34+08:00">
+                2017-11-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            <!--noindex-->
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/11/10/centos6-5做网关路由器详细实现方法/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count hc-comment-count" data-xid="2017/11/10/centos6-5做网关路由器详细实现方法/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+              <!--/noindex-->
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>最近因为公司的路由器老化导致上网时断时续，上半小时网就断一次网，为此我头疼不已，本着为公司节约成本的宗旨，决定自己弄一台centos做网关路由，于是在网上各种搜索，东拼西凑，总算是把这网关路由给搞定了。看到网上没有一篇完整说明centos做网关路由的文档，于是决定把我这次部署网关路由的经历分享给大家。<br>我的环境是这样的：<br>外网固定IP是180.159.110.130（公司官网兼邮件）、180.159.110.127（VPN）<br>网关路由的eth0外网口IP是180.159.110.130，eth1内网口IP是192.168.200.1，与eth1对接的是panabit网络行为管理控制设备，然后接到三层交换机上，三层交换机与centos网关路由eth1口对应的IP是192.168.200.254。Email内网IP是192.168.20.12，VPN内网IP是192.168.20.127<br>系统：centos6.5最小化<br>网卡：eth0走外网，eth1走内网<br>拓扑如下：</p>
+<p><a href="http://s2.51cto.com/wyfs02/M01/76/C4/wKiom1ZcBNvyS-lTAAEPTQAPzbM523.png" target="_blank" rel="external"></a></p>
+<p>部署步骤如下：<br>1、配置eth0网卡，信息如下：<br>    DEVICE=eth0<br>    HWADDR=14:DD:A9:E4:CF:32<br>    TYPE=Ethernet<br>    UUID=d60cfc7d-d34b-4e87-bce6-9fa216b8aee6<br>    ONBOOT=yes<br>    NM_CONTROLLED=no<br>    BOOTPROTO=static<br>    IPADDR=180.159.110.130<br>    NETMASK=255.255.255.0<br>    GATEWAY=180.159.110.225<br>    配置eth0:1接口，信息如下：<br>    DEVICE=eth0:1<br>    HWADDR=14:DD:A9:E4:CF:32<br>    TYPE=Ethernet<br>    UUID=d60cfc7d-d34b-4e87-bce6-9fa216b8aee6<br>    ONBOOT=yes<br>    NM_CONTROLLED=no<br>    BOOTPROTO=static<br>    IPADDR=180.159.110.127<br>    NETMASK=255.255.255.0<br>    GATEWAY=180.159.110.225<br>2、配置eth1网卡，信息如下：<br>    DEVICE=eth1<br>    HWADDR=00:E0:4C:81:23:11<br>    TYPE=Ethernet<br>    UUID=01b13968-0049-4778-b2ae-ae18b81b8722<br>    ONBOOT=yes<br>    NM_CONTROLLED=no<br>    BOOTPROTO=static<br>    IPADDR=192.168.200.1<br>    NETMASK=255.255.255.0<br>3、添加路由：<br>编辑/etc/sysconfig/network-scripts/route-eth1文件，内容如下：<br>   192.168.0.0/16 via 192.168.200.254<br>表示所有192.168.0.0网段的内网主机都通过192.168.200.254到达网关路由，因为我这里内网有很多网段，所以用的16位掩码<br>查看路由表：</p>
+<p><a href="http://s4.51cto.com/wyfs02/M00/76/C4/wKioL1ZcCXHRT8IkAAAb9L9Foq8804.png" target="_blank" rel="external"></a></p>
+<p>被红线画掉的是外网地址<br>4、启用转发和NAT，实现内外网的路由和NAT转换：<br>修改/etc/sysctl.conf文件，让包转发功能在系统启动时自动生效:</p>
+<pre><code># Controls IP packet forwarding
+net.ipv4.ip_forward = 1
+</code></pre><p><a href="http://s4.51cto.com/wyfs02/M01/76/C5/wKiom1ZcCb-R_nDaAAAHezywnOQ669.png" target="_blank" rel="external"></a></p>
+<p>5、配置iptables：<br>编辑/etc/sysconfig/iptables文件：</p>
+<p><a href="http://s5.51cto.com/wyfs02/M01/76/C5/wKiom1ZcDsuw7qR1AABG5o5a16A502.png" target="_blank" rel="external"></a></p>
+<p>6、设置iptables开机启动<br>chkconfig iptables on<br>reboot<br>到此，centos做为网关路由的工作基本完成，之后有什么其他的防火墙策略再另行添加即可。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://bg7ezy.github.io/2017/10/19/HackRF-扫描LTE基站-支持中国的TDD-LTE/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2000,168 +2166,6 @@ To be safe, it is probably best to keep LO harmonics 20 MHz or further away from
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://bg7ezy.github.io/2017/09/04/Hexo-自动添加转载标签/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="BG7EZY">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://img.hb.aicdn.com/a5dc9816e8c828d214151e4e4a3987090c966a1a2ad3c-WU5i7W_fw658">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="BG7EZY'S BLOG">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/09/04/Hexo-自动添加转载标签/" itemprop="url">Hexo 自动添加转载标签</a></h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-04T14:46:55+08:00">
-                2017-09-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/闲聊/" itemprop="url" rel="index">
-                    <span itemprop="name">闲聊</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            <!--noindex-->
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/09/04/Hexo-自动添加转载标签/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count hc-comment-count" data-xid="2017/09/04/Hexo-自动添加转载标签/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-              <!--/noindex-->
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h5 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h5><p>最近在网上转载了很多技术类博文，处于对文章原创作者劳动成果的尊重，我在文章开头都会写上文章转载出处。但是每次都要手工添加一次虽然工作量不大就是复制粘贴再粘贴。<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">转自: [http://xxx.com/xxx](http://xxx.com/xxx)</div></pre></td></tr></table></figure></p>
-<p>虽然很简单，但还是想有个什么方法再简化一下。</p>
-<h5 id="修改代码"><a href="#修改代码" class="headerlink" title="修改代码"></a>修改代码</h5><p>结合之前添加版权声明的修改方法，自己鼓捣了一个方案，效果达到了(PS:有更加简单直接的可以给我留言)。<br>修改 <code>themes/next/layout/_macro/post.swig</code> 文件,在<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/09/04/Hexo-自动添加转载标签/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2215,7 +2219,7 @@ To be safe, it is probably best to keep LO harmonics 20 MHz or further away from
             
               <a href="/archives/">
             
-                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-count">18</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2237,7 +2241,7 @@ To be safe, it is probably best to keep LO harmonics 20 MHz or further away from
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">24</span>
+                <span class="site-state-item-count">25</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
